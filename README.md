@@ -1,6 +1,6 @@
 # wallpaper
-
-An Electron application with Vue and TypeScript
+目前只适配了macOS的静态壁纸设置，后续会继续适配windows系统
+### 技术栈：Vue3、Typescript、vite-electron
 
 ## Recommended IDE Setup
 
