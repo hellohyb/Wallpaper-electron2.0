@@ -1,5 +1,5 @@
 ### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus
-目前只做了macOS静态壁纸更换和壁纸下载，后续会
+目前只做了macOS静态壁纸更换和壁纸下载，后续会继续完成剩余功能
 ### 技术分析：
 #### 1、macOS更换静态壁纸原理
 首先把壁纸下载到本地
