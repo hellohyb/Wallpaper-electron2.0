@@ -51,10 +51,7 @@ import { useRouter } from 'vue-router'
             fun:async function(){
                 if(await setLocalWallpaper()){
                     ElMessage({message:"设置成功！",type:"success"})
-                }else{
-                    ElMessage({message:"设置失败！",type:"error"})
                 }
-                
             }
         }
     ]
