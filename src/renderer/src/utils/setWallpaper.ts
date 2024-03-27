@@ -11,7 +11,7 @@ const setMac = (filePath) => {
 }
 // Windows
 const setWindows = (filePath) => {
-  const changeWallPaperCommand = `reg add "HKEY_CURRENT_USER/Control Panel/Desktop" /v Wallpaper /t REG_SZ /d ${filePath} && RUNDLL32.EXE user32.dll ,UpdatePerUserSystemParameters`
+  const changeWallPaperCommand = `reg add "HKEY_CURRENT_USER\\Control Panel\\Desktop" /v Wallpaper /t REG_SZ /d ${filePath.replaceAll('/','\\')} /f && RUNDLL32.EXE user32.dll UpdatePerUserSystemParameters`
   exec(changeWallPaperCommand, (error, _stdout, _stderr) => {
     if (error) {
       return false;
