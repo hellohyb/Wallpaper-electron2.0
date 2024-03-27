@@ -39,7 +39,7 @@ ipcMain.handle('selectFile',async (_e) => {
 })
 // 打开文件夹
 ipcMain.on('openDir',(_e) => {
-  let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + "/wallpaperDir" : app.getAppPath() + "/wallpaperDir";
+  let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + "\\wallpaperDir" : app.getAppPath() + "\\wallpaperDir";
   shell.openPath(dirPath)
 })
 // 发送当前安装路径
