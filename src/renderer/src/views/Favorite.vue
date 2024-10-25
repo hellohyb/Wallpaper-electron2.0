@@ -11,7 +11,7 @@ const categoryList = ref(getCategory())
 const activeList = ref('默认收藏')
 // 当前图片列表
 const imgList = ref(getImgListByCategory(activeList.value))
-// 更换收藏夹
+// 更换收藏夹(点击时触发)
 const changeCategory = (categoryName) => {
     activeList.value = categoryName
     imgList.value = getImgListByCategory(activeList.value)

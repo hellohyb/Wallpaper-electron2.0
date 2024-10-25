@@ -75,7 +75,7 @@ onMounted(async() => {
         <!-- 壁纸展示列表 -->
         <div class="wallpapers-list mt-50 grid grid-rows-4 grid-cols-5 gap-1">
             <div class="list-items relative" v-for="(item, index) in imageList.list" :key="`img-${index}`">
-                <img :src="item.url" 
+                <img v-lazy="item.url" 
                 @click="openViewImg(item)"
                 class="rounded-lg cursor-pointer " alt="" 
                 style="width: 100%;height: 100%;">
