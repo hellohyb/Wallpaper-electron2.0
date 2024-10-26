@@ -1,18 +1,20 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, nativeImage, Tray, Menu } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron'
 import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/iconTray.png?asset'
 app.commandLine.appendSwitch('disable-web-security');
+let mainWindow
 function createWindow(): void {
   // Create the browser window.
- const mainWindow = new BrowserWindow({
+ mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     minWidth:900,
     minHeight:670,
     show: false,
     autoHideMenuBar: true,
+    frame: false,
     titleBarStyle: 'hidden',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -37,42 +39,56 @@ ipcMain.handle('selectFile',async (_e) => {
     return false
   }
 })
+
 // 打开文件夹
 ipcMain.on('openDir',(_e) => {
   let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + "/wallpaperDir" : app.getAppPath() + "/wallpaperDir";
-  console.log(dirPath);
-  
   shell.openPath(dirPath)
 })
 // 发送当前安装路径
 ipcMain.handle('getAppPath',(_e) => {
   return app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
 })
-
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-Menu.setApplicationMenu(Menu.buildFromTemplate([]))
+
+// Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray:any
 app.whenReady().then(() => {
-  // 设置系统托盘
-  const icons = nativeImage.createFromPath('../../resources/icon.png')
-  tray = new Tray(icons)
+  // 创建系统托盘图标
+  tray = new Tray(icon); // 替换为你的图标路径
+  // 创建上下文菜单
   const contextMenu = Menu.buildFromTemplate([
-    { label: '退出', type: 'radio' },
-    { label: '切换壁纸（开发中）', type: 'radio', checked: true },
-  ])
-  tray.setContextMenu(contextMenu)
-  tray.setToolTip('This is a wallpaper APP')
-  tray.setTitle('Wallpaper')
+      {
+          label: '打开主界面',
+          click: () => {
+              mainWindow.show()
+          }
+      },
+      {
+          label: '退出',
+          click: () => {
+              app.quit();
+          }
+      }
+  ]);
+
+  // 设置上下文菜单
+  tray.setContextMenu(contextMenu);
+  tray.setToolTip('wallpaper动态壁纸');
+  // 单击托盘图标时的事件
+  tray.on('click', () => {
+      // createWindow();
+      console.log(123);
+      
+  });
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
   app.on('browser-window-created', (_, window) => {
