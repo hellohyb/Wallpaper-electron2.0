@@ -59,7 +59,7 @@ ipcMain.handle('getAppPath',(_e) => {
   }
 }
 
-// Menu.setApplicationMenu(Menu.buildFromTemplate([]))
+Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray:any
 app.whenReady().then(() => {
   // 创建系统托盘图标
@@ -69,7 +69,9 @@ app.whenReady().then(() => {
       {
           label: '打开主界面',
           click: () => {
-              mainWindow.show()
+            // if(mainWindow){
+            //   mainWindow.show();
+            // }
           }
       },
       {
