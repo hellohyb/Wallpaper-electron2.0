@@ -77,7 +77,9 @@ app.whenReady().then(() => {
       {
           label: '打开主界面',
           click: () => {
-              mainWindow.show()
+            // if(mainWindow){
+            //   mainWindow.show();
+            // }
           }
       },
       {
