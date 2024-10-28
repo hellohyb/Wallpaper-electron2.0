@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+const platform = process.platform
 
 </script>
 
 <template>
-    <div class="header">
+    <div class="header" v-if="platform !== 'win32'">
     </div>
 </template>
 

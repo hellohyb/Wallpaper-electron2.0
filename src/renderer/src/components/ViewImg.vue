@@ -12,9 +12,11 @@ const emit = defineEmits(['update:showView'])
 const closeView = () => {
     emit('update:showView',false)
 }
+const downloading = ref(false)
 // 设置壁纸
 const setPaper = async(imgUrl) => {
-    let res = await downloadWallpaper(imgUrl)
+    downloading.value = true
+    let res = await downloadThisImg(imgUrl)
     if(res){
         if(await setWallpaper(res)){
             ElMessage({message:"设置成功！",type:"success"})
@@ -25,6 +27,7 @@ const setPaper = async(imgUrl) => {
     else{
         ElMessage({message:"设置失败！",type:"error"})
     }
+    downloading.value = false
 }
 // 下载壁纸
 const downloadThisImg = async(imgUrl) => {
@@ -35,6 +38,7 @@ const downloadThisImg = async(imgUrl) => {
     else{
         ElMessage({message:"下载失败！",type:"error"})
     }
+    return res
 }
 
 // 收藏（点击收藏，弹出选择收藏夹节面）
@@ -98,7 +102,8 @@ const addFavoriteCategory = () => {
                 <span class="mt-1">下载</span>
             </div>
             <!-- 设为壁纸 -->
-            <el-button type="success" class="rounded-[5px]" size="large" @click="setPaper(props.imgInfo!.url)">设为壁纸</el-button>
+            <el-button v-if="!downloading" type="success" class="rounded-[5px]" size="large" @click="setPaper(props.imgInfo!.url)">设为壁纸</el-button>
+            <el-button v-else loading type="success" class="rounded-[5px]" size="large">下载中</el-button>
         </div>
         </el-dialog>
         <!-- 点击收藏时，显示选择收藏夹弹窗 -->
