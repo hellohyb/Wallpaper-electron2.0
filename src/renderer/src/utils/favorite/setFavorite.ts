@@ -1,5 +1,5 @@
 import { ref } from "vue";
-let favoriteAll = ref(JSON.parse(localStorage.getItem('favorite') as any))
+let favoriteAll = ref(JSON.parse(localStorage.getItem('favorite') as any)) || {}
 // 新增分类
 export function addCategory(categoryName){
     favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)

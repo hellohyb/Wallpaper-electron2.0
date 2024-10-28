@@ -3,6 +3,7 @@ import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
+import setWindowsWallPaper from './utils/setwindows'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
 function createWindow(): void {
@@ -42,7 +43,11 @@ ipcMain.handle('selectFile',async (_e) => {
 
 // 打开文件夹
 ipcMain.on('openDir',(_e) => {
-  let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + "/wallpaperDir" : app.getAppPath() + "/wallpaperDir";
+  let pathname = '/wallpaperDir'
+  if(process.platform == 'win32'){
+    pathname = '\\wallpaperDir'
+  }
+  let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
   shell.openPath(dirPath)
 })
 // 发送当前安装路径
@@ -59,6 +64,9 @@ ipcMain.handle('getAppPath',(_e) => {
   }
 }
 
+ipcMain.handle('setwindows', async (_event, param) => {
+  return setWindowsWallPaper(param.winfilepath);
+});
 // Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray:any
 app.whenReady().then(() => {

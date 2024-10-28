@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "axios": "^1.6.7",
+    "electron-edge-js": "^33.0.0",
     "element-plus": "^2.5.6",
     "less": "^4.2.0",
     "vue-lazyload": "^3.0.0",
