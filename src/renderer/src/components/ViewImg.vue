@@ -15,9 +15,12 @@ const closeView = () => {
 // 设置壁纸
 const setPaper = async(imgUrl) => {
     let res = await downloadWallpaper(imgUrl)
-    if(res){ 
-        setWallpaper(res)
-        ElMessage({message:"设置成功！",type:"success"})
+    if(res){
+        if(await setWallpaper(res)){
+            ElMessage({message:"设置成功！",type:"success"})
+        }else{
+            ElMessage({message:"设置失败！",type:"error"})
+        }
     }
     else{
         ElMessage({message:"设置失败！",type:"error"})

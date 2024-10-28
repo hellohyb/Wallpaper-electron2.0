@@ -12,14 +12,6 @@ const setMac = (filePath) => {
 }
 // Windows
 const setWindows = async (filePath) => {
-  // const changeWallPaperCommand = `reg add "HKEY_CURRENT_USER\\Control Panel\\Desktop" /v Wallpaper /t REG_SZ /d ${filePath.replaceAll('/','\\')} /f && RUNDLL32.EXE user32.dll UpdatePerUserSystemParameters`
-  // exec(changeWallPaperCommand, (error, _stdout, _stderr) => {
-  //   if (error) {
-  //     return false;
-  //   }else{
-  //     return true
-  //   }
-  // });
   // 路径反斜杠替换
   let winfilepath:any = []
   for(let i = 0; i < filePath.length; i++){
@@ -34,9 +26,9 @@ const {exec} = require('child_process')
 // 设置壁纸
 export default function setWallpaper(filePath){
     if(process.platform == 'darwin'){
-        setMac(filePath)
+        return setMac(filePath)
     }
     else if(process.platform == 'win32'){
-        setWindows(filePath)
+        return setWindows(filePath)
     }
 }
