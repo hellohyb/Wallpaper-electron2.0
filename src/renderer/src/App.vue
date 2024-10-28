@@ -2,7 +2,7 @@
 import { onMounted, provide, nextTick, ref } from 'vue';
 import Header from './components/Header.vue';
 import TopNav from './components/TopNav.vue';
-
+import { useRoute } from 'vue-router';
 const isRouterActive = ref(true)
 provide('reload',() => {
   isRouterActive.value = false
@@ -17,15 +17,17 @@ const initFavorite = () => {
     localStorage.setItem('favorite',JSON.stringify([{categoryName:'默认收藏',imgList:[]}]))
   }
 }
+const route = useRoute();
 onMounted(() => {
   initFavorite()
+  
 })
 </script>
 
 <template>
   <Header></Header>
   <div class="content">
-    <TopNav/>
+    <TopNav v-if="route.path !== '/video'"/>
     <router-view v-if="isRouterActive" v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" :key="$route.name" v-if="$route.meta.keepAlive"></component>

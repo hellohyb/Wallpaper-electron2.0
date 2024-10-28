@@ -3,6 +3,7 @@ import homeVue from "@renderer/views/Home.vue"
 import WallpaperVue from "@renderer/views/Wallpaper.vue"
 import FavoriteVue from "@renderer/views/Favorite.vue"
 import SearchVue from "@renderer/views/Search.vue"
+import Video from "@renderer/views/Video.vue"
 const routes = [
     {
         path:'/',
@@ -31,6 +32,11 @@ const routes = [
             name:'search',
             keepAlive:true
         }
+    },
+    {
+        path:'/video',
+        name:'video',
+        component:Video,
     }
 ]
 const router = createRouter({

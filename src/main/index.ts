@@ -1,9 +1,10 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import setWindowsWallPaper from './utils/setwindows'
+import setDynamicWallpaper from './utils/setDynamicWallpaper'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
 function createWindow(): void {
@@ -63,10 +64,62 @@ ipcMain.handle('getAppPath',(_e) => {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-
+let videoWindow
+function createVideoWindow(){
+  videoWindow = new BrowserWindow({
+    width: 900,
+    height: 670,
+    show: true,
+    frame: false,
+    fullscreen: true,
+    autoHideMenuBar: true,
+    titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden' ,
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false,
+      nodeIntegration:true,
+      contextIsolation:false,
+      webSecurity:false
+    }
+  })
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    videoWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/#/video')
+  } else {
+    videoWindow.loadFile(join(__dirname, '../renderer/index.html'),{hash:"/video"})
+  }
+}
+// windows设置静态壁纸
 ipcMain.handle('setwindows', async (_event, param) => {
   return setWindowsWallPaper(param.winfilepath);
 });
+// windows设置动态壁纸
+ipcMain.handle('setDynamicWin', async (_e) => {
+  const filepath = await openFileDialog();
+  if(filepath){
+    createVideoWindow();
+    // setDynamicWallpaper(mainWindow.getNativeWindowHandle().readInt32LE())
+    // 尝试加载 user32.dll
+    return true;
+  }
+  return false;
+  
+})
+
+// 打开视频文件选择对话框
+async function openFileDialog() {
+  let {canceled,filePaths} = await dialog.showOpenDialog({
+    title:"选择动态壁纸",
+    filters:[
+      {name:"视频",extensions:["mp4","mov"]}
+    ]
+  })
+    if(!canceled){
+      return filePaths
+    }else{
+      return false
+    }
+}
 // Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray:any
 app.whenReady().then(() => {
