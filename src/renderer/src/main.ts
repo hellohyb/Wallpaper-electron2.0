@@ -5,6 +5,7 @@ import '@renderer/assets/tailwindcssMain.css'
 import listenLocalStorage from '@renderer/utils/listenLocalStorage'
 import VueLazyload from 'vue-lazyload'
 import loadsvg from '@renderer/assets/loading.svg'
+
 createApp(App)
 .use(router)
 .use(listenLocalStorage)
