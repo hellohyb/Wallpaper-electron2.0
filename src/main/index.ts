@@ -15,8 +15,8 @@ function createWindow(): void {
     minHeight:670,
     show: false,
     autoHideMenuBar: true,
-    frame: false,
-    titleBarStyle: 'hidden',
+    frame: process.platform === 'win32' ? true : false,
+    titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden' ,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -77,9 +77,9 @@ app.whenReady().then(() => {
       {
           label: '打开主界面',
           click: () => {
-            // if(mainWindow){
-            //   mainWindow.show();
-            // }
+            if(mainWindow){
+              mainWindow.show();
+            }
           }
       },
       {
