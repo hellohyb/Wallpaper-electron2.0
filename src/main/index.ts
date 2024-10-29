@@ -1,5 +1,5 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron'
-import { join, resolve } from 'path'
+import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu,screen } from 'electron'
+import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
@@ -67,11 +67,12 @@ ipcMain.handle('getAppPath',(_e) => {
 let videoWindow
 function createVideoWindow(){
   videoWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: true,
+    width: 1920,
+    height: 1080,
     frame: false,
     fullscreen: true,
+    transparent:true,
+    alwaysOnTop: true,
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden' ,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -80,7 +81,7 @@ function createVideoWindow(){
       sandbox: false,
       nodeIntegration:true,
       contextIsolation:false,
-      webSecurity:false
+      webSecurity:false,
     }
   })
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -88,6 +89,9 @@ function createVideoWindow(){
   } else {
     videoWindow.loadFile(join(__dirname, '../renderer/index.html'),{hash:"/video"})
   }
+  videoWindow.on('ready-to-show',() => {
+    videoWindow.show()
+  })
 }
 // windows设置静态壁纸
 ipcMain.handle('setwindows', async (_event, param) => {
@@ -97,21 +101,29 @@ ipcMain.handle('setwindows', async (_event, param) => {
 ipcMain.handle('setDynamicWin', async (_e) => {
   const filepath = await openFileDialog();
   if(filepath){
-    createVideoWindow();
-    // setDynamicWallpaper(mainWindow.getNativeWindowHandle().readInt32LE())
-    // 尝试加载 user32.dll
-    return true;
+    // 如果播放窗口未打开
+    if(!videoWindow){
+      createVideoWindow();
+      setDynamicWallpaper(videoWindow.getNativeWindowHandle().readInt32LE(0))
+    }
+    // 设置窗口视频或者网页,发送文件路径
+    setTimeout(() => {
+      videoWindow.webContents.send("getFilePath",filepath[0])
+      return true;
+    }, 1000);
   }
-  return false;
   
 })
-
-// 打开视频文件选择对话框
+ipcMain.on("posmsg",(_e,msg) => {
+  console.log(msg);
+  
+})
+// 打开视频或网页文件选择对话框
 async function openFileDialog() {
   let {canceled,filePaths} = await dialog.showOpenDialog({
     title:"选择动态壁纸",
     filters:[
-      {name:"视频",extensions:["mp4","mov"]}
+      {name:"视频",extensions:["mp4","mov","html","htm"]}
     ]
   })
     if(!canceled){
@@ -120,6 +132,7 @@ async function openFileDialog() {
       return false
     }
 }
+
 // Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray:any
 app.whenReady().then(() => {

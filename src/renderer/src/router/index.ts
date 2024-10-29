@@ -4,6 +4,7 @@ import WallpaperVue from "@renderer/views/Wallpaper.vue"
 import FavoriteVue from "@renderer/views/Favorite.vue"
 import SearchVue from "@renderer/views/Search.vue"
 import Video from "@renderer/views/Video.vue"
+import Ai from "@renderer/views/Ai.vue"
 const routes = [
     {
         path:'/',
@@ -37,6 +38,11 @@ const routes = [
         path:'/video',
         name:'video',
         component:Video,
+    },
+    {
+        path:'/ai',
+        name:'ai',
+        component:Ai,
     }
 ]
 const router = createRouter({
