@@ -3,6 +3,7 @@ productName: wallpaper
 directories:
   buildResources: build
 files:
+  - resources/**
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
