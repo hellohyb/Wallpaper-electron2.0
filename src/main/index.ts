@@ -1,6 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron'
 import { join } from 'path'
-import path from 'path'
+const path = require("path")
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import setWindowsWallPaper from './utils/setwindows'
