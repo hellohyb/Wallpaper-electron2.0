@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const ipcRenderer = window.electron.ipcRenderer
 const filePath = ref('')
@@ -16,12 +16,9 @@ const htmlRef:any = ref(null)
 watch(filePath, (newPath) => {
     if (videoRef.value) {
         if(verifyFile(newPath) === 'html'){
-           
-            if(htmlRef.value){
-                console.log(newPath);
-            }
             showVideo.value = false
             htmlRef.value.src = newPath
+            ipcRenderer.invoke('openMouseHook')
         }
         else if(verifyFile(newPath) === 'video'){
             showVideo.value = true
@@ -50,10 +47,6 @@ const verifyFile = (filePath) => {
     }
     return;
 }
-
-document.addEventListener('mousemove',() => {
-    ipcRenderer.send("posmsg","movemovemove")
-})
 </script>
 
 <template>
@@ -82,12 +75,6 @@ document.addEventListener('mousemove',() => {
         border: none;
         overflow: hidden;
         display: block;
-        &::-webkit-scrollbar {
-            display: none !important; /* 隐藏滚动条 */
-        }
-    }
-    #iframe::-webkit-scrollbar {
-            display: none !important; /* 隐藏滚动条 */
     }
 }
 </style>

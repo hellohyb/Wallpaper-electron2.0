@@ -1,10 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu,screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron'
 import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import setWindowsWallPaper from './utils/setwindows'
 import setDynamicWallpaper from './utils/setDynamicWallpaper'
+import { SetMouseHook, UnhookMouse } from './utils/setMouseHook'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
 function createWindow(): void {
@@ -72,7 +73,6 @@ function createVideoWindow(){
     frame: false,
     fullscreen: true,
     transparent:true,
-    alwaysOnTop: true,
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden' ,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -91,12 +91,22 @@ function createVideoWindow(){
   }
   videoWindow.on('ready-to-show',() => {
     videoWindow.show()
+  }) 
+  videoWindow.on('close',() => {
+    UnhookMouse()
   })
 }
+
 // windows设置静态壁纸
 ipcMain.handle('setwindows', async (_event, param) => {
   return setWindowsWallPaper(param.winfilepath);
 });
+// 开启mouseHook（网页壁纸交互）
+ipcMain.handle('openMouseHook',(_e) => {
+  if(videoWindow){
+    SetMouseHook(videoWindow.getNativeWindowHandle().readInt32LE(0))
+  }
+})
 // windows设置动态壁纸
 ipcMain.handle('setDynamicWin', async (_e) => {
   const filepath = await openFileDialog();
@@ -112,10 +122,6 @@ ipcMain.handle('setDynamicWin', async (_e) => {
       return true;
     }, 1000);
   }
-  
-})
-ipcMain.on("posmsg",(_e,msg) => {
-  console.log(msg);
   
 })
 // 打开视频或网页文件选择对话框
@@ -185,6 +191,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    UnhookMouse()
     app.quit()
   }
 })
