@@ -6,7 +6,7 @@ const filePath = ref('')
 
 // 监听 IPC 消息以获取文件路径
 ipcRenderer.on("getFilePath", (_e, filePaths) => {
-    filePath.value = filePaths
+    filePath.value = 'file://' + filePaths
 })
 const showVideo = ref(true)
 // 引用 video 元素
@@ -15,19 +15,20 @@ const htmlRef:any = ref(null)
 // 监视 filePath 的变化
 watch(filePath, (newPath) => {
     if (videoRef.value) {
+        ipcRenderer.send("getVideos",newPath)
         if(verifyFile(newPath) === 'html'){
             showVideo.value = false
             htmlRef.value.src = newPath
-            ipcRenderer.invoke('openMouseHook')
+            if(process.platform === 'win32'){
+                ipcRenderer.invoke('openMouseHook')
+            }
         }
         else if(verifyFile(newPath) === 'video'){
             showVideo.value = true
             // 重新加载视频
             videoRef.value.load()
             // 自动播放新视频
-            // videoRef.value.play()
-            // 更新 video 元素的 src 属性
-            videoRef.value.src = newPath
+            videoRef.value.play()
         }
         
     }
@@ -47,11 +48,12 @@ const verifyFile = (filePath) => {
     }
     return;
 }
+document.title = "videoWallpaper"
 </script>
 
 <template>
-    <div class="contentss">
-        <video v-show="showVideo" ref="videoRef" autoplay muted loop style="width: 100vw;height: 100vh;border: none;outline: none;">
+    <div class="contentss" scroll="no">
+        <video style="object-fit: fill; width: 100%;height: 95vh;" v-show="showVideo" ref="videoRef" autoplay muted loop class="video">
             <source :src="filePath" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -62,19 +64,28 @@ const verifyFile = (filePath) => {
 </template>
 <style lang="less" scoped>
 .contentss{
-    margin: 0px;
-    padding: 0px;
-    width: 100vw;
-    height: 100vh;
-    background-color: transparent;
-    overflow: hidden !important;
-    transform: translateY(-3px);
+    width: 100%;
+    max-height: 100%;
+    overflow-y: hidden;
+    transform: translateY(-30px);
+    &::-webkit-scrollbar{
+        width: 0px;
+        height: 0px;
+        display: none;
+        scrollbar-width: none;
+        border: 0;
+    }
+    .video{
+        width: 100%;
+        height: 100%;
+        border: none;
+        object-fit: cover;
+    }
     #iframe{
         width: 100%;
         height: 100%;
         border: none;
         overflow: hidden;
-        display: block;
     }
 }
 </style>

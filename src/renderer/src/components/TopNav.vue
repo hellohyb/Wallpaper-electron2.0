@@ -40,15 +40,10 @@ const menuList:Array<navType> = [
         path:'/dynamic',
         fun:async function(){
             // ElMessage({type:'success',message:'开发中，敬请期待！'})
-            if(process.platform === 'win32'){
                 const result = await ipcRenderer.invoke('setDynamicWin')
                 if(result){
                     ElMessage({type:'success',message:'设置成功！'})
                 }
-            }else{
-                ElMessage({type:'success',message:'macos开发中，敬请期待！'})
-            }
-            
         } 
     },
     {
