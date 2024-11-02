@@ -2,13 +2,16 @@ const ipcRenderer = window.electron.ipcRenderer
 // macOS
 const setMac = (filePath) => {
     const changeWallPaperCommand = `osascript -e 'tell application "Finder" to set desktop picture to POSIX file "${filePath}"'`
-    exec(changeWallPaperCommand, (error, _stdout, _stderr) => {
-      if (error) {
-        return false;
-      }else{
-        return true
-      }
-    });
+    return new Promise(resolve => {
+      exec(changeWallPaperCommand, (error, _stdout, _stderr) => {
+        if (error) {
+          resolve(false)
+        }else{
+          resolve(true)
+        }
+      });
+    })
+    
 }
 // Windows
 const setWindows = async (filePath) => {
@@ -24,9 +27,9 @@ const setWindows = async (filePath) => {
 }
 const {exec} = require('child_process')
 // 设置壁纸
-export default function setWallpaper(filePath){
+export default async function setWallpaper(filePath){
     if(process.platform == 'darwin'){
-        return setMac(filePath)
+        return await setMac(filePath)
     }
     else if(process.platform == 'win32'){
         return setWindows(filePath)
