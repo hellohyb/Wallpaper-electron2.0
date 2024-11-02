@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
-import ipcMainList from './ipcMain/ipcMain'
+import ipcMainList from './ipcMain'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
 function createWindow(): void {
