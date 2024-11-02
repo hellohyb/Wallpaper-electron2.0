@@ -1,12 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu, screen } from 'electron'
+import { app, BrowserWindow, Tray, Menu } from 'electron'
 import { join } from 'path'
-const path = require("path")
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
-import setWindowsWallPaper from './utils/setwindows'
-import setDynamicWallpaper from './utils/setDynamicWallpaper'
-import { SetMouseHook, UnhookMouse } from './utils/setMouseHook'
-import setMacDynamicWallpaper from './utils/setMacDynamicWallpaper'
+import { UnhookMouse } from './utils/setMouseHook'
+import ipcMainList from './ipcMain/ipcMain'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
 function createWindow(): void {
@@ -29,34 +26,7 @@ function createWindow(): void {
       webSecurity: false
     }
   })
-  // 接受打开文件夹请求
-  ipcMain.handle('selectFile', async (_e) => {
-    let { canceled, filePaths } = await dialog.showOpenDialog({
-      title: "选择壁纸",
-      filters: [
-        { name: "图片", extensions: ["jpg", "png"] }
-      ]
-    })
-    if (!canceled) {
-      return filePaths
-    } else {
-      return false
-    }
-  })
 
-  // 打开文件夹
-  ipcMain.on('openDir', (_e) => {
-    let pathname = '/wallpaperDir'
-    if (process.platform == 'win32') {
-      pathname = '\\wallpaperDir'
-    }
-    let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
-    shell.openPath(dirPath)
-  })
-  // 发送当前安装路径
-  ipcMain.handle('getAppPath', (_e) => {
-    return app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
-  })
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -66,141 +36,8 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-let videoWindow
-function createVideoWindow() {
-  videoWindow = new BrowserWindow({
-    width: 1920,
-    height: 1080,
-    frame: false,
-    transparent: true,
-    focusable: false,
-    alwaysOnTop: true,
-    fullscreen:true,
-    autoHideMenuBar: true,
-    titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden',
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
-    }
-  })
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    videoWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/#/video')
-  } else {
-    videoWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: "/video" })
-  }
-  videoWindow.on('ready-to-show', () => {
-    videoWindow.show()
-  })
-  videoWindow.on('close', () => {
-    if(process.platform === 'win32'){
-      UnhookMouse()
-    }
-  })
-}
 
-let videoWindow2
-function createVideoWindow2() {
-  const { x,y,width, height } = screen.getPrimaryDisplay().bounds;
-  console.log({ x,y,width, height } );
-  
-  videoWindow2 = new BrowserWindow({
-    x:x,
-    y:y,
-    width:width,
-    height:height,
-    frame:false,
-    transparent:true,
-    useContentSize: true,
-    resizable: false,
-    autoHideMenuBar:true,
-    show: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
-    }
-  })
-  videoWindow2.setHasShadow(false)
-  app.dock.hide()
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    videoWindow2.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/#/video')
-  } else {
-    videoWindow2.loadFile(join(__dirname, '../renderer/index.html'), { hash: "/video" })
-  }
-  videoWindow2.on('ready-to-show',() => {
-    videoWindow2.show()
-  })
-  // 在窗口加载后获取 PID
-  videoWindow2.webContents.on('did-finish-load', () => {
-      setMacDynamicWallpaper(process.pid);
-    });
-}
-
-ipcMain.on("getVideos",(_e,msg) => {
-  console.log(msg);
-  
-})
-// windows设置静态壁纸
-ipcMain.handle('setwindows', async (_event, param) => {
-  return setWindowsWallPaper(param.winfilepath);
-});
-// 开启mouseHook（网页壁纸交互）
-ipcMain.handle('openMouseHook', (_e) => {
-  if (videoWindow) {
-    SetMouseHook(videoWindow.getNativeWindowHandle().readInt32LE(0))
-  }
-})
-// windows设置动态壁纸
-ipcMain.handle('setDynamicWin', async (_e) => {
-  const filepath = await openFileDialog();
-  if (filepath) {
-    if (process.platform === 'win32') {
-      // 如果播放窗口未打开
-      if (!videoWindow) {
-        createVideoWindow();
-        setDynamicWallpaper(videoWindow.getNativeWindowHandle().readInt32LE(0))
-      }
-      // 设置窗口视频或者网页,发送文件路径
-      setTimeout(() => {
-        videoWindow.webContents.send("getFilePath", filepath[0])
-        return true;
-      }, 1000);
-    }
-    if(process.platform === 'darwin'){
-      if(!videoWindow2){
-        createVideoWindow2();
-      }
-      // 设置窗口视频或者网页,发送文件路径
-      setTimeout(() => {
-        videoWindow2.webContents.send("getFilePath", filepath[0])
-      }, 1000);
-      
-    }
-  }
-
-})
-// 打开视频或网页文件选择对话框
-async function openFileDialog() {
-  let { canceled, filePaths } = await dialog.showOpenDialog({
-    title: "选择动态壁纸",
-    filters: [
-      { name: "视频", extensions: ["mp4", "mov", "html", "htm"] }
-    ]
-  })
-  if (!canceled) {
-    return filePaths
-  } else {
-    return false
-  }
-}
-
+ipcMainList();
 // Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray: any
 app.whenReady().then(() => {
