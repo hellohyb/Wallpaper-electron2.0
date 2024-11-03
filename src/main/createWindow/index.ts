@@ -7,13 +7,13 @@ import setMacDynamicWallpaper from "../utils/setMacDynamicWallpaper"
 // windows动态壁纸窗口
 export function createVideoWindow() {
     const videoWindow = new BrowserWindow({
-        width: 1920,
-        height: 1080,
+        width: 800,
+        height: 600,
         frame: false,
         transparent: true,
         focusable: false,
-        alwaysOnTop: true,
-        fullscreen: true,
+        // alwaysOnTop: true,
+        // fullscreen: true,
         autoHideMenuBar: true,
         titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden',
         webPreferences: {
