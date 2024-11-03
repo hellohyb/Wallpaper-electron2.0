@@ -12,8 +12,8 @@ export function createVideoWindow() {
         frame: false,
         transparent: true,
         focusable: false,
-        // alwaysOnTop: true,
-        // fullscreen: true,
+        alwaysOnTop: true,
+        fullscreen: true,
         autoHideMenuBar: true,
         titleBarStyle: process.platform === 'win32' ? 'default' : 'hidden',
         webPreferences: {

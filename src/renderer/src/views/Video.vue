@@ -67,7 +67,7 @@ document.title = "videoWallpaper"
     width: 100%;
     max-height: 100%;
     overflow-y: hidden;
-    transform: translateY(-30px);
+    transform: translateY(0px);
     &::-webkit-scrollbar{
         width: 0px;
         height: 0px;
