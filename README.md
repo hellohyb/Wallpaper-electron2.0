@@ -1,5 +1,10 @@
 ### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus
-目前只做了macOS静态壁纸更换和壁纸下载，后续会继续完成剩余功能
+当前进度：
+✅已完成 windows静态壁纸更换
+✅已完成 macos静态壁纸更换
+✅已完成 windows动态壁纸更换
+✅修复中 windows网页壁纸
+✅修复中 macos动态壁纸，网页壁纸
 ### 技术分析：
 #### 1、macOS更换静态壁纸原理
 首先把壁纸下载到本地
@@ -8,9 +13,10 @@
 osascript -e 'tell application "Finder" to set desktop picture to POSIX file "壁纸存放位置"'
 ```
 最后通过node执行终端命令，实现壁纸更换
-#### 2、Windows更换壁纸原理（暂未适配，开发中）：
-详细原理请看：[https://github.com/hellohyb/WallPaper-electron](https://github.com/hellohyb/WallPaper-electron)
-#### 3、macOS动态壁纸原理：开发中
+#### 2、macOS更换动态壁纸原理
+动态加载objective-c把窗口放在桌面层，然后生成dylib文件，在electron中利用koffi调用，把窗口句柄传递过去
+#### 3、Windows更换壁纸原理：
+维护开发中。。。
 ### 壁纸api
 小鸟壁纸、bing每日壁纸
 
