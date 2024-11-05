@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import ipcMainList from './ipcMain'
+import randWallpaper from './utils/randWallpaper'
 app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
 // app.commandLine.appendSwitch('ignore-gpu-blacklist');
@@ -54,7 +55,7 @@ function createWindow(): void {
 }
 
 ipcMainList();
-// Menu.setApplicationMenu(Menu.buildFromTemplate([]))
+Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray: any
 app.whenReady().then(() => {
   // 创建系统托盘图标
@@ -67,6 +68,13 @@ app.whenReady().then(() => {
         if (mainWindow) {
           mainWindow.show();
         }
+      }
+    },
+    {
+      label: '随机一张壁纸',
+      click: async () => {
+        randWallpaper(mainWindow)
+        
       }
     },
     {
@@ -84,8 +92,6 @@ app.whenReady().then(() => {
   // 单击托盘图标时的事件
   tray.on('click', () => {
     // createWindow();
-    console.log(123);
-
   });
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -108,6 +114,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     UnhookMouse()
+    app.quit()
+  }else{
     app.quit()
   }
 })

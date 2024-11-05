@@ -10,7 +10,7 @@ const openViewImg = (item) => {
     showView.value = true
 }
 onMounted(async() => {
-    newWallpaper.value = (await getNewList()).data.data
+    newWallpaper.value = (await getNewList(1,5)).data.data
     let oldBingWallpaper:any = await (await getBingWallpaper(8)).data.images
     oldBingWallpaper.forEach((item) => {
         bingWallpaperList.value.push({
