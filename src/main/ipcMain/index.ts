@@ -78,6 +78,16 @@ export default function ipcMainList() {
     }
 
   })
+
+  // 更换静态壁纸时关闭动态壁纸窗口
+  ipcMain.handle('closeVideoWindow',(_e) => {
+    if(videoWindow){
+      videoWindow.close()
+    }
+    if(videoWindow2){
+      videoWindow2.close()
+    }
+  })
 }
 
 // 打开视频或网页文件选择对话框

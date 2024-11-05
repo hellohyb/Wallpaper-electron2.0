@@ -26,8 +26,10 @@ const setWindows = async (filePath) => {
   return await ipcRenderer.invoke('setwindows',{winfilepath});
 }
 const {exec} = require('child_process')
-// 设置壁纸
+// 设置静态壁纸
 export default async function setWallpaper(filePath){
+    // 如果动态壁纸还在运行，则关闭动态壁纸窗口
+    ipcRenderer.invoke("closeVideoWindow")
     if(process.platform == 'darwin'){
         return await setMac(filePath)
     }
