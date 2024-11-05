@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow, Tray, Menu, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
@@ -6,6 +6,7 @@ import { UnhookMouse } from './utils/setMouseHook'
 import ipcMainList from './ipcMain'
 app.commandLine.appendSwitch('disable-web-security');
 let mainWindow
+let menuSwitch = false;
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -29,6 +30,17 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+  mainWindow.on('close',(event) => {
+    const remainingWindows = BrowserWindow.getAllWindows();
+    // 如果当前还有动态壁纸窗口 以及 不是点击的菜单栏里的退出选项
+    if (remainingWindows.length > 1 && !menuSwitch){
+      event.preventDefault();  // 阻止窗口关闭
+      mainWindow.minimize()
+    }else if(menuSwitch){
+      return;
+    }
+    
   })
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -56,6 +68,7 @@ app.whenReady().then(() => {
     {
       label: '退出',
       click: () => {
+        menuSwitch = true
         app.quit();
       }
     }
