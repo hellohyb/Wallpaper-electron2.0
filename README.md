@@ -1,4 +1,6 @@
 ### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus、C++、objective-c
+### 项目预览
+![项目预览](image.png)
 当前进度：
 ##### ✅已完成 windows静态壁纸更换
 ##### ✅已完成 macos静态壁纸更换
