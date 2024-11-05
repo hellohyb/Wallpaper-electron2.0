@@ -5,6 +5,10 @@ import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import ipcMainList from './ipcMain'
 app.commandLine.appendSwitch('disable-web-security');
+// GPU加速
+// app.commandLine.appendSwitch('ignore-gpu-blacklist');
+// app.commandLine.appendSwitch('enable-gpu-rasterization');
+
 let mainWindow
 let menuSwitch = false;
 function createWindow(): void {
