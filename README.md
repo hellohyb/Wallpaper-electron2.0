@@ -3,6 +3,7 @@
 [![pAsrbLR.png](https://s21.ax1x.com/2024/11/05/pAsrbLR.png)](https://imgse.com/i/pAsrbLR)
 
 当前进度：
+##### ✅已完成 其余基本功能
 ##### ✅已完成 windows静态壁纸更换
 ##### ✅已完成 macos静态壁纸更换
 ##### ✅已完成 windows动态壁纸更换
