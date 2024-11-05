@@ -4,7 +4,7 @@ const Koffi = require('koffi');
 
 let dllPath;
 if (app.isPackaged) {
-  dllPath = path.join(process.resourcesPath, 'lib', 'test.dylib');
+  dllPath = path.join(__dirname, '..', '..', '..', 'app.asar.unpacked', 'resources', 'lib', 'test.dylib');
 } else {
   dllPath = path.join(app.getAppPath(), 'resources', 'lib', 'test.dylib');
 }
