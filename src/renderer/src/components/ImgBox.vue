@@ -19,14 +19,15 @@ const openViewImg = () => {
         @click="openViewImg()"
         style="width: 100%;height: 100%;"
          alt="img">
+         <ViewImg v-model:showView="showView" :imgInfo="imgInfo"/>
     </div>
-    <ViewImg v-model:showView="showView" :imgInfo="imgInfo"/>
+    
 </template>
 
 <style lang="less" scoped>
 .imgBox{
-    width: 30%;
-    height: calc(30vw*(1/2));
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     margin-bottom: 10px;
     img{

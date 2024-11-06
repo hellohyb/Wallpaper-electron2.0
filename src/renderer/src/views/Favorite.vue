@@ -123,7 +123,7 @@ onMounted(() => {
                 <span class="text-sm ml-2">新建收藏夹</span>
             </div>
        </div>
-        <div v-if="imgList.length > 0" class="right-img flex-1 px-2 py-2 flex flex-wrap">
+        <div v-if="imgList.length > 0" class="right-img flex-1 px-4 py-2 grid grid-cols-4 gap-4 auto-rows-min overflow-y-auto">
             <ImgBox v-for="item in imgList" :imgInfo="item"/>
         </div>
         <div v-else class="right-img flex-1 px-2 py-2 flex justify-center items-center flex-col">
@@ -149,12 +149,14 @@ onMounted(() => {
     box-shadow: 0 0 0 1px rgb(210, 210, 210);
     font-size: 12px;
     background-color: #fff;
+    user-select: none;
 }
 .favorite{
     width: 100%;
     height: calc(100vh - 100px);
     .left-menu{
         border-right: 1px solid rgb(240, 240, 240);
+        user-select: none;
         li{
             list-style: none;
         }

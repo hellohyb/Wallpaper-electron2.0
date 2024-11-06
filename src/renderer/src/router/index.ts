@@ -5,6 +5,7 @@ import FavoriteVue from "@renderer/views/Favorite.vue"
 import SearchVue from "@renderer/views/Search.vue"
 import Video from "@renderer/views/Video.vue"
 import Ai from "@renderer/views/Ai.vue"
+import More from "@renderer/views/More.vue"
 const routes = [
     {
         path:'/',
@@ -43,6 +44,11 @@ const routes = [
         path:'/ai',
         name:'ai',
         component:Ai,
+    },
+    {
+        path:'/more',
+        name:'more',
+        component:More,
     }
 ]
 const router = createRouter({
