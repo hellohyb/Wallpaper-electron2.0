@@ -4,8 +4,8 @@ import setWindowsWallPaper from "../utils/setwindows";
 import { SetMouseHook } from "../utils/setMouseHook";
 import setDynamicWallpaper from "../utils/setDynamicWallpaper";
 import { createVideoWindow, createVideoWindow2 } from "../createWindow";
-export default function ipcMainList() {
-  let videoWindow: any = null, videoWindow2: any = null
+let videoWindow: any = null, videoWindow2: any = null
+export function ipcMainList() {
   // 打开文件夹
   ipcMain.on('openDir', (_e) => {
     let pathname = '/wallpaperDir'
@@ -57,6 +57,9 @@ export default function ipcMainList() {
         // 如果播放窗口未打开
         if (!videoWindow) {
           videoWindow = createVideoWindow();
+          videoWindow.on('closed', () => {
+            videoWindow = null;  // 确保清理引用
+          });
           setDynamicWallpaper(videoWindow.getNativeWindowHandle().readInt32LE(0))
         }
         // 设置窗口视频或者网页,发送文件路径
@@ -68,6 +71,9 @@ export default function ipcMainList() {
       if (process.platform === 'darwin') {
         if (!videoWindow2) {
           videoWindow2 = createVideoWindow2();
+          videoWindow2.on('closed', () => {
+            videoWindow2 = null;  // 确保清理引用
+          });
         }
         // 设置窗口视频或者网页,发送文件路径
         setTimeout(() => {
@@ -83,13 +89,19 @@ export default function ipcMainList() {
   ipcMain.handle('closeVideoWindow',(_e) => {
     if(videoWindow){
       videoWindow.close()
+      videoWindow = null
     }
     if(videoWindow2){
       videoWindow2.close()
+      videoWindow = null
     }
   })
 }
 
+export function getVideoWindow(){
+  return {videoWindow,videoWindow2}
+  
+}
 // 打开视频或网页文件选择对话框
 async function openFileDialog() {
   let { canceled, filePaths } = await dialog.showOpenDialog({
