@@ -1,12 +1,16 @@
 ### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus、C++、objective-c
+### 项目预览
+[![pAsrbLR.png](https://s21.ax1x.com/2024/11/05/pAsrbLR.png)](https://imgse.com/i/pAsrbLR)
+
 当前进度：
+##### ✅已完成 其余基本功能
 ##### ✅已完成 windows静态壁纸更换
 ##### ✅已完成 macos静态壁纸更换
 ##### ✅已完成 windows动态壁纸更换
 ##### ✅已完成 随机切换壁纸
 
-##### ✅修复中 windows网页壁纸
-##### ✅修复中 macos动态壁纸，网页壁纸
+##### ✅修复中 windows网页互动壁纸（90%）
+##### ✅修复中 macos动态壁纸（95%）
 
 ### 技术分析：
 #### 1、macOS更换 静态壁纸 原理
