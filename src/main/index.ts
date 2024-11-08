@@ -1,15 +1,17 @@
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow, Tray, Menu, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
-import ipcMainList from './ipcMain'
+import { ipcMainList, getVideoWindow } from './ipcMain'
+import randWallpaper from './utils/randWallpaper'
 app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
 // app.commandLine.appendSwitch('ignore-gpu-blacklist');
 // app.commandLine.appendSwitch('enable-gpu-rasterization');
 
 let mainWindow
+let menuSwitch = false;
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -34,6 +36,17 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+  mainWindow.on('close',(event) => {
+    const remainingWindows = BrowserWindow.getAllWindows();
+    // 如果当前还有动态壁纸窗口 以及 不是点击的菜单栏里的退出选项
+    if (remainingWindows.length > 1 && !menuSwitch){
+      event.preventDefault();  // 阻止窗口关闭
+      mainWindow.minimize()
+    }else if(menuSwitch){
+      return;
+    }
+    
+  })
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -42,38 +55,78 @@ function createWindow(): void {
 }
 
 ipcMainList();
-// Menu.setApplicationMenu(Menu.buildFromTemplate([]))
+Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray: any
+let defaultMenu = [
+  {
+    label: '打开主界面',
+    click: () => {
+      if (mainWindow) {
+        mainWindow.show();
+      }
+    }
+  },
+  {
+    label: '换一张壁纸',
+    click: async () => {
+      randWallpaper(mainWindow)
+    }
+  },
+  {
+    label: '关闭动态壁纸',
+    enabled: false,
+    click: () => {
+      if(getVideoWindow().videoWindow){
+        getVideoWindow().videoWindow.close()
+      }
+      if(getVideoWindow().videoWindow2){
+        getVideoWindow().videoWindow2.close()
+      }
+    }
+  },
+  {
+    label: '退出',
+    click: () => {
+      menuSwitch = true
+      app.quit();
+    }
+  }
+]
+let contextMenu
 app.whenReady().then(() => {
   // 创建系统托盘图标
   tray = new Tray(icon); // 替换为你的图标路径
   // 创建上下文菜单
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: '打开主界面',
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-        }
-      }
-    },
-    {
-      label: '退出',
-      click: () => {
-        app.quit();
-      }
-    }
-  ]);
+  contextMenu = Menu.buildFromTemplate(defaultMenu);
 
   // 设置上下文菜单
-  tray.setContextMenu(contextMenu);
   tray.setToolTip('wallpaper动态壁纸');
   // 单击托盘图标时的事件
   tray.on('click', () => {
     // createWindow();
-    console.log(123);
-
+    // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
+    if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
+      defaultMenu[defaultMenu.length - 2].enabled = true
+      contextMenu = Menu.buildFromTemplate(defaultMenu);
+    }else{
+      defaultMenu[defaultMenu.length - 2].enabled = false
+      contextMenu = Menu.buildFromTemplate(defaultMenu);
+    }
+     // 手动弹出右键菜单
+     tray.popUpContextMenu(contextMenu);
   });
+  tray.on('right-click',() => {
+    // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
+    if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
+      defaultMenu[defaultMenu.length - 2].enabled = true
+      contextMenu = Menu.buildFromTemplate(defaultMenu);
+    }else{
+      defaultMenu[defaultMenu.length - 2].enabled = false
+      contextMenu = Menu.buildFromTemplate(defaultMenu);
+    }
+     // 手动弹出右键菜单
+     tray.popUpContextMenu(contextMenu);
+  })
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
   app.on('browser-window-created', (_, window) => {
@@ -95,6 +148,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     UnhookMouse()
+    app.quit()
+  }else{
     app.quit()
   }
 })

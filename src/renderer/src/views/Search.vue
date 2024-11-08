@@ -43,8 +43,8 @@ const search = async() => {
                     </template>
                 </el-input>
             </div>
-            <div class="result-main pt-2 flex justify-center flex-wrap">
-                <ImgBox v-for="item in wallpaperList.list" :imgInfo="item"/>
+            <div class="result-main pt-2 grid grid-cols-4 gap-2 auto-rows-min overflow-y-auto">
+                <ImgBox v-for="item in wallpaperList.list" :imgInfo="item" style="margin-top: 2px;"/>
             </div>
         </div>
     </div>
@@ -53,7 +53,9 @@ const search = async() => {
 <style lang="less" scoped>
 .search{
     width: 100%;
+    height: calc(100vh - 80px);
     box-sizing: border-box;
+    overflow: hidden;
     .search-info{
         width: 100%;
         height: 100%;
@@ -73,11 +75,10 @@ const search = async() => {
         height: 100%;
         .result-main{
             width: 100%;
-            height: calc(100vh - 180px);
+            padding: 0 10px;
+            box-sizing: border-box;
+            overflow-x: hidden;
             overflow-y: scroll;
-            &::-webkit-scrollbar {
-                display: none;
-            }
         }
     }
     

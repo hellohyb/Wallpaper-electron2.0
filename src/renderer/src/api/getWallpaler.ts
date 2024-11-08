@@ -34,9 +34,9 @@ export function searchWallpaper(key,pageno) {
 }
 
 // 最新壁纸
-export function getNewList() {
+export function getNewList(pageNo,count) {
   return axios({
-    url:`${url}/newestList?pageno=1&count=5`,
+    url:`${url}/newestList?pageno=${pageNo}&count=${count}`,
     method:'get',
     headers:{
       'Content-Type': 'application/json', 

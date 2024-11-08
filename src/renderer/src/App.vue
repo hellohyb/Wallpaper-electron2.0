@@ -3,7 +3,11 @@ import { onMounted, provide, nextTick, ref } from 'vue';
 import Header from './components/Header.vue';
 import TopNav from './components/TopNav.vue';
 import { useRoute } from 'vue-router';
+import { getNewList } from './api/getWallpaler';
+import downloadWallpaper from './utils/download';
+import setWallpaper from './utils/setWallpaper';
 const isRouterActive = ref(true)
+const ipcRenderer = window.electron.ipcRenderer
 provide('reload',() => {
   isRouterActive.value = false
   nextTick(() => {
@@ -18,6 +22,14 @@ const initFavorite = () => {
   }
 }
 const route = useRoute();
+// 监听菜单栏随机壁纸设置
+ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
+  let imgUrl = (await getNewList(msg.pageNo,10)).data.data.list[msg.No].url
+  let res = await downloadWallpaper(imgUrl)
+  if(res){
+    await setWallpaper(res)
+  }
+})
 onMounted(() => {
   initFavorite()
   

@@ -43,7 +43,7 @@ export function createVideoWindow() {
 // macos动态壁纸窗口
 export function createVideoWindow2() {
     const { x, y, width, height } = screen.getPrimaryDisplay().bounds;
-    const videoWindow2 = new BrowserWindow({
+    let videoWindow2:any = new BrowserWindow({
         x: x,
         y: y,
         width: width,
@@ -75,6 +75,9 @@ export function createVideoWindow2() {
     // 在窗口加载后获取 PID
     videoWindow2.webContents.on('did-finish-load', () => {
         setMacDynamicWallpaper(process.pid);
+    });
+    videoWindow2.on('closed', () => {
+        videoWindow2 = null;  // 确保清理引用
     });
     return videoWindow2
 }
