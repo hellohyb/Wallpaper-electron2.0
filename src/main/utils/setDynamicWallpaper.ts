@@ -37,8 +37,8 @@ export default function setDynamicWallpaper(handlers) {
       return true;
     };
     // 注册一个回调函数指针
-    const callbackProto = koffi.proto('__stdcall', 'callbackProto', 'bool', ['int32', 'int32']);
-    const EnumWindows = lib.func('EnumWindows', 'bool', [koffi.pointer(callbackProto), 'int32']);
+    const callbackProto2 = koffi.proto('__stdcall', 'callbackProto2', 'bool', ['int32', 'int32']);
+    const EnumWindows = lib.func('EnumWindows', 'bool', [koffi.pointer(callbackProto2), 'int32']);
     EnumWindows(callback, 0);
   }
 

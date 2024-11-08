@@ -4,6 +4,7 @@ import setWindowsWallPaper from "../utils/setwindows";
 import { SetMouseHook } from "../utils/setMouseHook";
 import setDynamicWallpaper from "../utils/setDynamicWallpaper";
 import { createVideoWindow, createVideoWindow2 } from "../createWindow";
+import { SetMouseHook2 } from "../utils/setMouseHook2";
 export default function ipcMainList() {
   let videoWindow: any = null, videoWindow2: any = null
   // 打开文件夹

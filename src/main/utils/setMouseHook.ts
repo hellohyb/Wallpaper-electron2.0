@@ -17,12 +17,12 @@ if(isWin){
 }
 export function SetMouseHook(handles) {
   if(isWin){
-    SetMouseHookDll.SetMouseHook(handles);
+    SetMouseHookDll(handles);
   }
 }
 
 export function UnhookMouse() {
   if(isWin){
-    UnhookMouseDll.UnhookMouse();
+    UnhookMouseDll();
   }
 }
