@@ -98,6 +98,7 @@ onMounted(() => {
             </li>
             <div v-show="showContextmenu" ref="menuDom" class="contextmenu w-[100px] py-1 rounded-md absolute">
                 <li @click="cleanFavoriteImg()" class="w-full py-1 text-center cursor-pointer hover:btn-active">清空图片</li>
+                <li class="w-full py-1 text-center cursor-pointer hover:btn-active">导入文件夹</li>
                 <li v-if="liDomInnerText !== '默认收藏'" @click="dialogVisible = true" class="w-full py-1 text-center cursor-pointer !text-[red] hover:btn-active">删除收藏夹</li>
             </div>
             <!-- 删除前确认框 -->

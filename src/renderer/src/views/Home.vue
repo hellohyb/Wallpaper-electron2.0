@@ -25,7 +25,7 @@ onMounted(async() => {
 <template>
     <div class="home">
         <div class="top-item w-[100%] h-[100%] overflow-hidden">
-            <p class="m-0 mb-1 colorful-text">bing每日壁纸</p>
+            <p class="m-0 mb-1 colorful-text">每日壁纸</p>
             <div class="swiper-box w-[100%] h-[70%] flex">
                 <div class="swiper w-[75%] h-[100%] bg-white rounded-md overflow-hidden">
                     <el-carousel :interval="4000" style="height: 100%;">
@@ -81,6 +81,7 @@ onMounted(async() => {
     height: calc(100vh - 83px);
     padding: 10px 20px;
     box-sizing: border-box;
+    user-select: none;
     .img-item{
         img{
             transition: all .5s;

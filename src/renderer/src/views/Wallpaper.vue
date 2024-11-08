@@ -15,7 +15,7 @@ const changeCategory = async(id) => {
     // 收缩菜单
     if(categoryListDom.value.getAttribute('nowState') == 'show'){
         categoryListDom.value.classList.remove("!max-h-[500px]","transition-all","duration-500")
-        more.value.innerText = '更多'
+        more.value.innerText = '展开更多'
         categoryListDom.value.setAttribute('nowState','hidden')
     }
 }
@@ -30,7 +30,7 @@ const showMore = () => {
         categoryListDom.value.setAttribute('nowState','show')
     }else{
         categoryListDom.value.classList.remove("!max-h-[500px]","transition-all","duration-500")
-        more.value.innerText = '更多'
+        more.value.innerText = '展开更多'
         categoryListDom.value.setAttribute('nowState','hidden')
     }
 }
@@ -70,10 +70,10 @@ onMounted(async() => {
                 >
                 {{ item.category }}
             </div>
-            <span class=" absolute top-3 right-2 text-[#409EFF] cursor-pointer" @click="showMore()" ref="more">更多</span>
+            <span class=" absolute top-3 right-2 text-[#409EFF] cursor-pointer" @click="showMore()" ref="more">展开更多</span>
         </div>
         <!-- 壁纸展示列表 -->
-        <div class="wallpapers-list mt-50 grid grid-rows-4 grid-cols-5 gap-1">
+        <div class="wallpapers-list mt-50 grid grid-rows-4 grid-cols-5 gap-2">
             <div class="list-items relative" v-for="(item, index) in imageList.list" :key="`img-${index}`">
                 <img v-lazy="item.url" 
                 @click="openViewImg(item)"
@@ -100,6 +100,7 @@ onMounted(async() => {
     .category{
         box-shadow: 0px 6px 6px #ececec;
         font-size: 14px;
+        user-select: none;
     }
     .wallpapers-list{
         height: calc(100vh - 180px);
