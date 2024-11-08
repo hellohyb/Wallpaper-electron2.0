@@ -4,7 +4,7 @@ export default function setWindowsWallPaper(filepath) {
     const koffi = require('koffi');
     let dllPath;
     if (app.isPackaged) {
-      dllPath = path.join(__dirname, '..', '..', 'app.asar.unpacked', 'resources', 'lib', 'changewallpaper.dll');
+      dllPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'lib', 'changewallpaper.dll');
     } else {
       dllPath = path.join(app.getAppPath(), 'resources', 'lib', 'changewallpaper.dll');
     }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, dialog } from 'electron'
+import { app, BrowserWindow, Tray, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
