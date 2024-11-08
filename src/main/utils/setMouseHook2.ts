@@ -22,6 +22,8 @@ export function SetMouseHook2(handlers){
             return user32.CallNextHookEx(0, nCode, wParam, lParam);
         });
         // 设置钩子
+        console.log(handlers);
+        
         hook = user32.SetWindowsHookExW(WH_MOUSE, mouseHookCallback, 0, 0);
     }
 }

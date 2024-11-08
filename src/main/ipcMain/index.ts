@@ -107,7 +107,7 @@ async function openFileDialog() {
   let { canceled, filePaths } = await dialog.showOpenDialog({
     title: "选择动态壁纸",
     filters: [
-      { name: "视频或网页", extensions: ["mp4", "mov", "html", "htm"] }
+      { name: "视频", extensions: ["mp4","webm"] }
     ]
   })
   if (!canceled) {

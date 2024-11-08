@@ -7,7 +7,7 @@ if(isWin){
   // 加载 DLL
   let dllPath;
   if (app.isPackaged) {
-    dllPath = path.join(process.resourcesPath, 'lib', 'mousehook2.dll');
+    dllPath = path.join(process.resourcesPath, 'app.asar.unpacked','resources','lib', 'mousehook2.dll');
   } else {
     dllPath = path.join(app.getAppPath(), 'resources', 'lib', 'mousehook.dll');
   }
@@ -17,12 +17,12 @@ if(isWin){
 }
 export function SetMouseHook(handles) {
   if(isWin){
-    SetMouseHookDll.SetMouseHook(handles);
+    SetMouseHookDll(handles);
   }
 }
 
 export function UnhookMouse() {
   if(isWin){
-    UnhookMouseDll.UnhookMouse();
+    UnhookMouseDll();
   }
 }
