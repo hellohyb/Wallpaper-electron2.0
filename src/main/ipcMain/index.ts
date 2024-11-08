@@ -7,13 +7,13 @@ import { createVideoWindow, createVideoWindow2 } from "../createWindow";
 let videoWindow: any = null, videoWindow2: any = null
 export function ipcMainList() {
   // 打开文件夹
-  ipcMain.on('openDir', (_e) => {
+  ipcMain.handle('openDir', (_e) => {
     let pathname = '/wallpaperDir'
     if (process.platform == 'win32') {
       pathname = '\\wallpaperDir'
     }
     let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
-    shell.openPath(dirPath)
+    return shell.openPath(dirPath)
   })
   // 发送当前安装路径
   ipcMain.handle('getAppPath', (_e) => {
