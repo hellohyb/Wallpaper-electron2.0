@@ -5,13 +5,15 @@ import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import { ipcMainList, getVideoWindow } from './ipcMain'
 import randWallpaper from './utils/randWallpaper'
+import { startRandChangeWallpaper, stopRandChangeWallpaper } from './utils/randChangeWallpaper'
 app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
-// app.commandLine.appendSwitch('ignore-gpu-blacklist');
-// app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
 
 let mainWindow
 let menuSwitch = false;
+let startChanging = false;
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -73,6 +75,18 @@ let defaultMenu = [
     }
   },
   {
+    label: '开启播放壁纸',
+    click: async () => {
+      if(startChanging){
+        stopRandChangeWallpaper()
+        startChanging = false
+      }else{
+        startRandChangeWallpaper(mainWindow)
+        startChanging = true
+      }
+    }
+  },
+  {
     label: '关闭动态壁纸',
     enabled: false,
     click: () => {
@@ -101,31 +115,32 @@ app.whenReady().then(() => {
 
   // 设置上下文菜单
   tray.setToolTip('wallpaper动态壁纸');
+
+  // 设置菜单
+  const setMenu = () => {
+        // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
+        if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
+          defaultMenu[defaultMenu.length - 2].enabled = true
+        }else{
+          defaultMenu[defaultMenu.length - 2].enabled = false
+        }
+        // 如果随机播放图片壁纸正在运行，则显示停止播放
+        if(startChanging){
+          defaultMenu[defaultMenu.length - 3].label = '关闭随机播放'
+        }else{
+          defaultMenu[defaultMenu.length - 3].label = '开启播放壁纸'
+        }
+        contextMenu = Menu.buildFromTemplate(defaultMenu);
+         // 手动弹出右键菜单
+         tray.popUpContextMenu(contextMenu);
+  }
   // 单击托盘图标时的事件
   tray.on('click', () => {
     // createWindow();
-    // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
-    if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
-      defaultMenu[defaultMenu.length - 2].enabled = true
-      contextMenu = Menu.buildFromTemplate(defaultMenu);
-    }else{
-      defaultMenu[defaultMenu.length - 2].enabled = false
-      contextMenu = Menu.buildFromTemplate(defaultMenu);
-    }
-     // 手动弹出右键菜单
-     tray.popUpContextMenu(contextMenu);
+    setMenu()
   });
   tray.on('right-click',() => {
-    // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
-    if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
-      defaultMenu[defaultMenu.length - 2].enabled = true
-      contextMenu = Menu.buildFromTemplate(defaultMenu);
-    }else{
-      defaultMenu[defaultMenu.length - 2].enabled = false
-      contextMenu = Menu.buildFromTemplate(defaultMenu);
-    }
-     // 手动弹出右键菜单
-     tray.popUpContextMenu(contextMenu);
+    setMenu()
   })
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')

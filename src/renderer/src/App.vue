@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router';
 import { getNewList } from './api/getWallpaler';
 import downloadWallpaper from './utils/download';
 import setWallpaper from './utils/setWallpaper';
+import getDefaultDirectory from './utils/getDefaultDirectory';
 const isRouterActive = ref(true)
 const ipcRenderer = window.electron.ipcRenderer
 provide('reload',() => {
@@ -30,9 +31,34 @@ ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
     await setWallpaper(res)
   }
 })
-onMounted(() => {
+// 初始化Localstorage
+const initSettingConfig = async () => {
+  const config = {
+    downloadPath: await getDefaultDirectory(), // 下载地址
+    cachePath: await getDefaultDirectory(), // 缓存地址
+    player:{
+      no:1,           // 1壁纸库随机，2收藏夹， 3本地目录
+      localPath:'',   // 本地目录路径
+      favoriteName:'默认收藏',    //  收藏夹名
+      order:1,        // 1顺序，0随机
+      changeTime: 10, // 壁纸切换间隔
+    },
+    closeWindow: 0, // 关闭窗口时：1:最小化，0:直接退出
+    start: false, // 开机是否启动应用
+    GPU: false
+  }
+  localStorage.setItem("config",JSON.stringify(config))
+}
+// 获取localstorage
+const sendLocalStorage = () => {
+  ipcRenderer.send("send-config",JSON.parse(localStorage.getItem('config') as any))
+}
+onMounted(async () => {
   initFavorite()
-  
+  if(!localStorage.getItem("config")){
+    await initSettingConfig()
+  }
+  sendLocalStorage()
 })
 </script>
 
