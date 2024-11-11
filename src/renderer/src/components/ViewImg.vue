@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import downloadWallpaper from '@renderer/utils/download';
+import { downloadWallpaper } from '@renderer/utils/download';
 import setWallpaper from '@renderer/utils/setWallpaper';
 import { addFavorite, isFavorited, delFavorite, addCategory } from '@renderer/utils/favorite/setFavorite'
 import { ref } from 'vue';
@@ -29,9 +29,10 @@ const setPaper = async(imgUrl) => {
     }
     downloading.value = false
 }
+const donwloadDir = ref(JSON.parse(localStorage.getItem('config') as any).downloadPath || null)
 // 下载壁纸
 const downloadThisImg = async(imgUrl) => {
-    let res = await downloadWallpaper(imgUrl)
+    let res = await downloadWallpaper(imgUrl,donwloadDir.value)
     if(res){ 
         ElMessage({message:"下载成功！",type:"success"})
     }

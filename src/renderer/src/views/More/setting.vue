@@ -3,20 +3,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import { Edit, Folder } from '@element-plus/icons-vue'
 const ipcRenderer = window.electron.ipcRenderer
 const oldConfig = JSON.parse(localStorage.getItem("config") as any)
-const config = reactive({
-    downloadPath: oldConfig.downloadPath, // 下载地址
-    cachePath: oldConfig.cachePath, // 缓存地址
-    player:{
-      no:oldConfig.player.no,           // 1壁纸库随机，2收藏夹， 3本地目录
-      localPath:oldConfig.player.localPath,   // 本地目录路径
-      favoriteName:oldConfig.player.favoriteName,    //  收藏夹名
-      order:oldConfig.player.order,        // 1顺序，0随机
-      changeTime: oldConfig.player.changeTime, // 壁纸切换间隔
-    },
-    closeWindow: oldConfig.closeWindow, // 关闭窗口时：1:最小化，0:直接退出
-    start: oldConfig.start, // 开机是否启动应用
-    GPU: oldConfig.GPU
-})
+const config = reactive(oldConfig)
 // 修改下载文件夹
 const selectDir = async () => {
   const DirPath = await ipcRenderer.invoke('selectDir')
@@ -38,17 +25,19 @@ const saveSetting = () => {
   localStorage.setItem('config', JSON.stringify(config))
 }
 let favoriteList = ref()
+// 获取收藏夹信息，过滤掉为空的收藏夹
 const getFavoriteList = () => {
-    favoriteList.value = JSON.parse(localStorage.getItem("favorite") as any)
+    favoriteList.value = JSON.parse(localStorage.getItem("favorite") as any).filter((item) => {
+      return item.imgList.length != 0
+    })
 }
 watch(config,(_new,_old) => {
     saveSetting()
     // 深拷贝
     const configStr = JSON.parse(JSON.stringify(config))
-    ipcRenderer.send('send-config',configStr)
+    ipcRenderer.send('send-config',{config:configStr,favoriteList:JSON.parse(JSON.stringify(favoriteList.value))})
 },{deep:true})
 onMounted(async () => {
-
   getFavoriteList()
 })
 </script>
@@ -113,7 +102,7 @@ onMounted(async () => {
         </template>
         </el-input-number>
       </div>
-      <span style="font-size: 12px; color: teal">当目录设置为收藏夹或本地目录时，请确保里面图片文件不为空。设置完成时请在菜单栏重新开启播放壁纸。</span>
+      <span style="font-size: 12px; color: teal">当目录设置为本地目录时，请确保文件夹里面图片文件不为空。设置完成时请在菜单栏重新开启播放壁纸。</span>
     </div>
     <div class="set-item">
       <h3 class="title">应用设置</h3>

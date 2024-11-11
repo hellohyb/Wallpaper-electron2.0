@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import setLocalWallpaper from '@renderer/utils/setLocalWallpaper';
+import { ref } from 'vue';
 import { RouteLocationRaw, useRouter } from 'vue-router'
 interface navType{
     name:String,
@@ -9,6 +10,7 @@ interface navType{
     fun:Function
 }
 const router = useRouter()
+const donwloadDir = ref(JSON.parse(localStorage.getItem('config') as any).downloadPath || null)
 const ipcRenderer = window.electron.ipcRenderer
 const menuList:Array<navType> = [
     {
@@ -74,7 +76,7 @@ const menuList:Array<navType> = [
         svgHtml:`<svg t="1708674063372" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6119" width="24" height="24"><path d="M886.4 128H608v64h233.6l104.64 288H672v32a160 160 0 0 1-320 0v-32H77.76L182.4 192H416V128H137.6L0 506.24V1024h1024V506.24zM64 960V544h226.24a224 224 0 0 0 443.52 0H960v416z" fill="#515151" p-id="6120"></path><path d="M393.28 438.72l118.72 118.4 118.72-118.4-45.44-45.44-41.28 41.6V0h-64v434.88l-41.28-41.6-45.44 45.44z" fill="#515151" p-id="6121"></path></svg>`,
         path:'/downloaded',
         fun:async function(){
-            const res = await ipcRenderer.invoke("openDir")
+            const res = await ipcRenderer.invoke("openDir",donwloadDir.value)
             if(res === 'Failed to open path'){
                 ElMessage({message:"暂无已下载图片",type:"warning"})
             }

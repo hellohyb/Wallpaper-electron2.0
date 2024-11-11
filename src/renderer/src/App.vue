@@ -4,11 +4,12 @@ import Header from './components/Header.vue';
 import TopNav from './components/TopNav.vue';
 import { useRoute } from 'vue-router';
 import { getNewList } from './api/getWallpaler';
-import downloadWallpaper from './utils/download';
+import { downloadWallpaper, mkdirsSync } from './utils/download';
 import setWallpaper from './utils/setWallpaper';
 import getDefaultDirectory from './utils/getDefaultDirectory';
 const isRouterActive = ref(true)
 const ipcRenderer = window.electron.ipcRenderer
+const route = useRoute();
 provide('reload',() => {
   isRouterActive.value = false
   nextTick(() => {
@@ -22,8 +23,13 @@ const initFavorite = () => {
     localStorage.setItem('favorite',JSON.stringify([{categoryName:'默认收藏',imgList:[]}]))
   }
 }
-const route = useRoute();
-// 监听菜单栏随机壁纸设置
+// 初始化缓存目录，下载目录
+const initDefaultDir = async () => {
+  const paths = await getDefaultDirectory()
+  mkdirsSync(paths)
+}
+
+// 监听菜单栏随机壁纸设置(壁纸库)
 ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
   let imgUrl = (await getNewList(msg.pageNo,10)).data.data.list[msg.No].url
   let res = await downloadWallpaper(imgUrl)
@@ -31,7 +37,14 @@ ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
     await setWallpaper(res)
   }
 })
-// 初始化Localstorage
+// 监听菜单栏轮播壁纸设置(收藏夹)
+ipcRenderer.on('setWallpaperByFavorite',async(_e,filePath) => {
+  let res = await downloadWallpaper(filePath)
+  if(res){
+    await setWallpaper(res)
+  }
+})
+// 初始化设置项
 const initSettingConfig = async () => {
   const config = {
     downloadPath: await getDefaultDirectory(), // 下载地址
@@ -51,10 +64,14 @@ const initSettingConfig = async () => {
 }
 // 获取localstorage
 const sendLocalStorage = () => {
-  ipcRenderer.send("send-config",JSON.parse(localStorage.getItem('config') as any))
+  ipcRenderer.send("send-config",{
+    config:JSON.parse(localStorage.getItem('config') as any),
+    favoriteList:JSON.parse(localStorage.getItem('favorite') as any)
+  })
 }
 onMounted(async () => {
   initFavorite()
+  await initDefaultDir()
   if(!localStorage.getItem("config")){
     await initSettingConfig()
   }

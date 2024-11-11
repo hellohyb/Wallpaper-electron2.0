@@ -15,6 +15,8 @@ export function ipcMainList() {
         pathname = '\\wallpaperDir'
       }
       dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
+    }else{
+      dirPath = msg
     }
     return shell.openPath(dirPath)
   })

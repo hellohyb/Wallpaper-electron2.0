@@ -3,7 +3,7 @@ const http = require('http')
 const path = require('path')
 import getDefaultDirectory from "./getDefaultDirectory"
 // 新建文件夹
-const mkdirsSync = (dirname) => {
+export function mkdirsSync (dirname) {
   // 判断文件夹是否存在
     if (fs.existsSync(dirname)) {
       return true;
@@ -17,7 +17,7 @@ const mkdirsSync = (dirname) => {
 }
 
 // 下载图片
-export default async function downloadWallpaper(imgUrl,dirname = null){
+export async function downloadWallpaper(imgUrl,dirname = null){
     const dirname_ok = dirname == null ? await getDefaultDirectory() : dirname
     // 通过图片路径截取图片名
     const fileName = imgUrl.slice(imgUrl.lastIndexOf('/') + 1,imgUrl.lastIndexOf('.') - 1) + '.jpg'

@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import { ipcMainList, getVideoWindow } from './ipcMain'
-import randWallpaper from './utils/randWallpaper'
+import {randWallpaper} from './utils/randWallpaper'
 import { startRandChangeWallpaper, stopRandChangeWallpaper } from './utils/randChangeWallpaper'
 app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
@@ -40,8 +40,8 @@ function createWindow(): void {
   })
   mainWindow.on('close',(event) => {
     const remainingWindows = BrowserWindow.getAllWindows();
-    // 如果当前还有动态壁纸窗口 以及 不是点击的菜单栏里的退出选项
-    if (remainingWindows.length > 1 && !menuSwitch){
+    // 如果当前还有动态壁纸窗口或者正在轮播壁纸 以及 不是点击的菜单栏里的退出选项
+    if ((remainingWindows.length > 1 || startChanging) && !menuSwitch){
       event.preventDefault();  // 阻止窗口关闭
       mainWindow.minimize()
     }else if(menuSwitch){
@@ -75,7 +75,7 @@ let defaultMenu = [
     }
   },
   {
-    label: '开启播放壁纸',
+    label: '开启轮播壁纸',
     click: async () => {
       if(startChanging){
         stopRandChangeWallpaper()
@@ -126,9 +126,9 @@ app.whenReady().then(() => {
         }
         // 如果随机播放图片壁纸正在运行，则显示停止播放
         if(startChanging){
-          defaultMenu[defaultMenu.length - 3].label = '关闭随机播放'
+          defaultMenu[defaultMenu.length - 3].label = '关闭轮播壁纸'
         }else{
-          defaultMenu[defaultMenu.length - 3].label = '开启播放壁纸'
+          defaultMenu[defaultMenu.length - 3].label = '开启轮播壁纸'
         }
         contextMenu = Menu.buildFromTemplate(defaultMenu);
          // 手动弹出右键菜单
