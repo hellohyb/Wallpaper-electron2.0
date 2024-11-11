@@ -44,14 +44,14 @@ export function createVideoWindow() {
 export function createVideoWindow2() {
     const { x, y, width, height } = screen.getPrimaryDisplay().bounds;
     let videoWindow2:any = new BrowserWindow({
-        x: x,
-        y: y,
+        x:x,
+        y:y,
         width: width,
         height: height,
         frame: false,
         transparent: true,
-        useContentSize: true,
         resizable: false,
+        simpleFullscreen:true,
         autoHideMenuBar: true,
         show: false,
         webPreferences: {

@@ -4,7 +4,7 @@
 
 @layer components {
     .btn-active{
-        background-color: #409EFF;
+        background-color: #409EFF !important;
         color: #fff;
         border-radius: 5px;
         transition: all .1s;

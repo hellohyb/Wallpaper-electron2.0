@@ -5,7 +5,9 @@ import FavoriteVue from "@renderer/views/Favorite.vue"
 import SearchVue from "@renderer/views/Search.vue"
 import Video from "@renderer/views/Video.vue"
 import Ai from "@renderer/views/Ai.vue"
-import More from "@renderer/views/More.vue"
+import More from "@renderer/views/More/index.vue"
+import Setting from "@renderer/views/More/setting.vue"
+import About from "@renderer/views/More/about.vue"
 const routes = [
     {
         path:'/',
@@ -47,8 +49,21 @@ const routes = [
     },
     {
         path:'/more',
-        name:'more',
         component:More,
+        name:'more',
+        redirect:'/more/setting',
+        children:[
+            {
+                path:'/more/setting',
+                name:'more1',
+                component:Setting
+            },
+            {
+                path:'/more/about',
+                name:'more2',
+                component:About
+            },
+        ]
     }
 ]
 const router = createRouter({

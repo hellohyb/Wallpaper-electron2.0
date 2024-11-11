@@ -24,6 +24,7 @@ watch(filePath, (newPath) => {
             }
         }
         else if(verifyFile(newPath) === 'video'){
+            videoRef.value.requestFullscreen();
             showVideo.value = true
             // 重新加载视频
             videoRef.value.load()
@@ -53,7 +54,7 @@ document.title = "videoWallpaper"
 
 <template>
     <div class="contentss" scroll="no">
-        <video style="object-fit: fill; width: 100%;height: 95vh;" v-show="showVideo" ref="videoRef" autoplay muted loop class="video">
+        <video style="object-fit: fill; width: 100%;height: 95vh;" v-show="showVideo" ref="videoRef" autoplay muted loop controls="false" class="video">
             <source :src="filePath" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -65,7 +66,7 @@ document.title = "videoWallpaper"
 <style lang="less" scoped>
 .contentss{
     width: 100%;
-    max-height: 100%;
+    height: 100%;
     overflow-y: hidden;
     transform: translateY(0px);
     &::-webkit-scrollbar{
