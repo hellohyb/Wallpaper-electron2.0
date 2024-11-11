@@ -7,20 +7,34 @@ import { createVideoWindow, createVideoWindow2 } from "../createWindow";
 let videoWindow: any = null, videoWindow2: any = null
 export function ipcMainList() {
   // 打开文件夹
-  ipcMain.handle('openDir', (_e) => {
-    let pathname = '/wallpaperDir'
-    if (process.platform == 'win32') {
-      pathname = '\\wallpaperDir'
+  ipcMain.handle('openDir', (_e,msg = null) => {
+    let dirPath
+    if(msg === null){
+      let pathname = '/wallpaperDir'
+      if (process.platform == 'win32') {
+        pathname = '\\wallpaperDir'
+      }
+      dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
     }
-    let dirPath = app.isPackaged ? path.dirname(app.getPath('exe')) + pathname : app.getAppPath() + pathname;
     return shell.openPath(dirPath)
+  })
+  // 选择文件夹，并返回文件夹路径
+  ipcMain.handle('selectDir',async (_e) => {
+    const result = await dialog.showOpenDialog({
+      title:"选择存放图片的文件夹",
+      properties: ['openDirectory']  // 只允许选择文件夹
+    });
+    if (!result.canceled) {
+      return result.filePaths[0];
+    }
+    return;
   })
   // 发送当前安装路径
   ipcMain.handle('getAppPath', (_e) => {
     return app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
   })
 
-  // 接受打开文件夹请求（选择图片壁纸）
+  // 打开选择文件对话框（选择图片壁纸）
   ipcMain.handle('selectFile', async (_e) => {
     let { canceled, filePaths } = await dialog.showOpenDialog({
       title: "选择壁纸",
