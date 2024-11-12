@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from 'vue'
-import { Edit, Folder } from '@element-plus/icons-vue'
+import { Edit, Folder,InfoFilled } from '@element-plus/icons-vue'
 const ipcRenderer = window.electron.ipcRenderer
 const oldConfig = JSON.parse(localStorage.getItem("config") as any)
 const config = reactive(oldConfig)
@@ -78,6 +78,14 @@ onMounted(async () => {
                     :value="item.categoryName"
                 />
             </el-select>
+            <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="不会包含空收藏夹"
+            placement="top"
+          >
+          <el-icon><InfoFilled /></el-icon>
+          </el-tooltip>
         </el-radio>
           <el-radio :value="3">
             <span>本地目录:</span>
@@ -150,6 +158,16 @@ onMounted(async () => {
       font-size: 14px;
       width: 100%;
       margin: 10px auto;
+      &:deep(.el-radio__label){
+        display: flex;
+        align-items: center;
+      }
+      &:deep(.el-input-number__decrease){
+        background-color: transparent;
+      }
+      &:deep(.el-input-number__increase){
+        background-color: transparent;
+      }
     }
   }
 }

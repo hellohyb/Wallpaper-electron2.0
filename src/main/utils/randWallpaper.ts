@@ -8,3 +8,7 @@ export async function randWallpaper(mainWindow){
 export function randWallpaperByFavorite(mainWindow, filePath){
     mainWindow.webContents.send('setWallpaperByFavorite',filePath)
 }
+
+export function randChangeWallpaperByLocal(mainWindow,filePath){
+    mainWindow.webContents.send('setWallpaperByLocal',filePath)
+}
