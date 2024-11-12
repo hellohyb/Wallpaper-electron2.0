@@ -5,8 +5,12 @@ import '@renderer/assets/tailwindcssMain.css'
 import listenLocalStorage from '@renderer/utils/listenLocalStorage'
 import VueLazyload from 'vue-lazyload'
 import loadsvg from '@renderer/assets/loading.svg'
+import { createPinia } from 'pinia'
+import pinia from './stores/pinia'
 
 createApp(App)
+.use(createPinia())
+.use(pinia)
 .use(router)
 .use(listenLocalStorage)
 .use(VueLazyload, {

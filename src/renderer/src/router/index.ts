@@ -26,7 +26,7 @@ const routes = [
     {
         path:'/favorite',
         name:'favorite',
-        component:FavoriteVue
+        component:FavoriteVue,
     },
     {
         path:'/search',
