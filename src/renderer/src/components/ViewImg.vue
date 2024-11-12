@@ -8,15 +8,17 @@ const props = defineProps({
     showView:Boolean,
     imgInfo:Object
 })
+
 const emit = defineEmits(['update:showView'])
 const closeView = () => {
     emit('update:showView',false)
 }
 const downloading = ref(false)
 // 设置壁纸
-const setPaper = async(imgUrl) => {
+const setPaper = async(imgInfos) => {
+    let imgUrl = imgInfos.url
     downloading.value = true
-    let res = await downloadThisImg(imgUrl)
+    let res = imgInfos.local ? imgInfos.url : await downloadThisImg(imgUrl)
     if(res){
         if(await setWallpaper(res)){
             ElMessage({message:"设置成功！",type:"success"})
@@ -44,7 +46,9 @@ const downloadThisImg = async(imgUrl) => {
 
 // 收藏（点击收藏，弹出选择收藏夹节面）
 const beforeSetFavorite = (imgInfo) => {
-    addFavorite(imgInfo,nowCategory.value)
+    if(addFavorite(imgInfo,nowCategory.value)){
+        ElMessage({message:"收藏成功！",type:"success"})
+    }
     showSelectFavorite.value = false
 }
 
@@ -98,12 +102,13 @@ const addFavoriteCategory = () => {
                 <span class="mt-1">已收藏</span>
             </div>
             <!-- 下载 -->
-            <div @click="downloadThisImg(props.imgInfo!.url)" class="icons w-[80px] h-[80px] flex flex-col justify-center items-center">
+            <div v-if="!props.imgInfo!.local" @click="downloadThisImg(props.imgInfo!.url)" class="icons w-[80px] h-[80px] flex flex-col justify-center items-center">
                 <svg t="1708601249467" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13704" width="40" height="40"><path d="M892.5 879.2h-761c-18.4 0-33.3-14.9-33.3-33.3V679.5c0-18.4 14.9-33.3 33.3-33.3h30c18.4 0 33.3 14.9 33.3 33.3 0 4.5-0.9 8.9-2.6 12.8l-13 64.8c0 18.4 14.9 33.3 33.3 33.3h599c18.4 0 33.3-14.9 33.3-33.3l-13-64.8c-1.7-3.9-2.6-8.3-2.6-12.8 0-18.4 14.9-33.3 33.3-33.3h30c18.4 0 33.3 14.9 33.3 33.3v166.4c0 18.4-14.9 33.3-33.3 33.3z m-66.6-500.3v0.6c2.6 1.1 4.4 3.7 4.4 6.7s-1.8 5.6-4.4 6.7v0.4L520.7 706.1h-0.4c-1.1 2.6-3.7 4.4-6.7 4.4s-5.6-1.8-6.7-4.4h-0.4L201.4 393.2v-0.4c-2.6-1.1-4.4-3.7-4.4-6.7s1.8-5.6 4.4-6.7v-0.6h-13.9 207v-51c0-18.4 14.9-33.3 33.3-33.3h168.6c18.4 0 33.3 14.9 33.3 33.3v51H840h-14.1z m-224-115.4H422.1c-15.3 0-27.7-12.4-27.7-27.7s12.4-27.7 27.7-27.7h179.7c15.3 0 27.7 12.4 27.7 27.7s-12.3 27.7-27.6 27.7z m11-84.3H411.1c-9.2 0-16.6-7.5-16.6-16.6 0-9.2 7.5-16.6 16.6-16.6H613c9.2 0 16.6 7.5 16.6 16.6 0 9.2-7.5 16.6-16.7 16.6z" fill="#2c2c2c" p-id="13705"></path></svg>
                 <span class="mt-1">下载</span>
             </div>
+
             <!-- 设为壁纸 -->
-            <el-button v-if="!downloading" type="success" class="rounded-[5px]" size="large" @click="setPaper(props.imgInfo!.url)">设为壁纸</el-button>
+            <el-button v-if="!downloading" type="success" class="rounded-[5px]" size="large" @click="setPaper(props.imgInfo)">设为壁纸</el-button>
             <el-button v-else loading type="success" class="rounded-[5px]" size="large">下载中</el-button>
         </div>
         </el-dialog>

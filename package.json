@@ -29,6 +29,7 @@
     "less": "^4.2.0",
     "node-addon-api": "^8.2.1",
     "node-gyp": "^10.2.0",
+    "pinia": "^2.2.6",
     "vue-lazyload": "^3.0.0",
     "vue-router": "^4.3.0"
   },

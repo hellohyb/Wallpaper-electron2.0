@@ -1,4 +1,7 @@
 import { ref } from "vue";
+import { useMessageStore } from '@renderer/stores/messageStore'
+import pinia from "@renderer/stores/pinia";
+const messageStore = useMessageStore(pinia);
 let favoriteAll = ref(JSON.parse(localStorage.getItem('favorite') as any)) || {}
 // 新增分类
 export function addCategory(categoryName){
@@ -35,8 +38,18 @@ export function addFavorite(imgInfo,categoryName = '默认收藏'){
         }
     }
     localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
-    ElMessage({message:"收藏成功！",type:"success"})
     return true
+}
+// 从本地导入时，格式化文件内容并保存至对应的收藏夹
+export function insertLocalImageToFavorite(imageUrl,categoryName){
+    // '/Users/huang/Downloads/pow-pow-jinx-desktop-7w8wu4y734gpkwoy.jpg'
+    let imageInfo = {
+        url:'file://'+imageUrl,
+        tag:'本地图片：'+ imageUrl.slice(imageUrl.lastIndexOf('/') + 1,imageUrl.length),
+        id:Date.now()+Math.random()*(10000-99999)+99999,
+        local:true
+    }
+    addFavorite(imageInfo,categoryName)
 }
 // 取消收藏
 export function delFavorite(imgInfo){
@@ -48,6 +61,8 @@ export function delFavorite(imgInfo){
     }
     localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
     favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    // 通知收藏夹刷新
+    messageStore.updateDelState(true)
     ElMessage({message:"已取消收藏",type:"success"})
     return true
 }

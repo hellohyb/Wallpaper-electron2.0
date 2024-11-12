@@ -39,9 +39,15 @@ ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
 })
 // 监听菜单栏轮播壁纸设置(收藏夹)
 ipcRenderer.on('setWallpaperByFavorite',async(_e,filePath) => {
-  let res = await downloadWallpaper(filePath)
+  let res = filePath.slice(0,4) === 'file' ? filePath : await downloadWallpaper(filePath)
   if(res){
     await setWallpaper(res)
+  }
+})
+// 监听菜单栏轮播壁纸设置(本地目录)
+ipcRenderer.on('setWallpaperByLocal',async(_e,filePath) => {
+  if(filePath){
+    await setWallpaper(filePath)
   }
 })
 // 初始化设置项
