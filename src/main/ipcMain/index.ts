@@ -43,12 +43,12 @@ export function ipcMainList() {
     return app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
   })
 
-  // 打开选择文件对话框（选择图片壁纸）
+  // 打开选择文件对话框（选择图片壁纸-单选）
   ipcMain.handle('selectFile', async (_e) => {
     let { canceled, filePaths } = await dialog.showOpenDialog({
       title: "选择壁纸",
       filters: [
-        { name: "图片", extensions: ["jpg", "png"] }
+        { name: "图片", extensions: ["jpg", "png", "jpeg"] }
       ]
     })
     if (!canceled) {
@@ -57,7 +57,22 @@ export function ipcMainList() {
       return false
     }
   })
-  
+
+  // 打开选择文件对话框（选择图片壁纸-多选）
+  ipcMain.handle('selectFiles',async (_e) => {
+    let { canceled, filePaths } = await dialog.showOpenDialog({
+      title: "选择壁纸",
+      properties: ['openFile', 'multiSelections'], // 支持多选
+      filters: [
+        { name: "图片", extensions: ["jpg", "png", "jpeg"] }
+      ]
+    })
+    if (!canceled) {
+      return filePaths
+    } else {
+      return false
+    }
+  })
   // windows设置静态壁纸
   ipcMain.handle('setwindows', async (_event, param) => {
     return setWindowsWallPaper(param.winfilepath);

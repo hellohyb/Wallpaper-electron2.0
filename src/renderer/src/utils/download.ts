@@ -20,7 +20,7 @@ export function mkdirsSync (dirname) {
 export async function downloadWallpaper(imgUrl,dirname = null){
     const dirname_ok = dirname == null ? await getDefaultDirectory() : dirname
     // 通过图片路径截取图片名
-    const fileName = imgUrl.slice(imgUrl.lastIndexOf('/') + 1,imgUrl.lastIndexOf('.') - 1) + '.jpg'
+    const fileName = imgUrl.slice(imgUrl.lastIndexOf('/') + 4,imgUrl.lastIndexOf('.') - 1) + '.jpg'
     if(dirname_ok && mkdirsSync(dirname_ok)){
       // 下载文件
       return new Promise((resolve, _reject) => {

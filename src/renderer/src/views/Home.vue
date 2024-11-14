@@ -30,7 +30,7 @@ onMounted(async() => {
                 <div class="swiper w-[75%] h-[100%] bg-white rounded-md overflow-hidden">
                     <el-carousel :interval="4000" style="height: 100%;">
                         <el-carousel-item style="width: 100%;height: 100%;" v-for="item in bingWallpaperList.slice(0,5)" :key="item">
-                            <img @click="openViewImg(item)" :src="item.url" style="width: 100%;height: 100%;cursor: pointer;" alt="">
+                            <img @click="openViewImg(item)" v-lazy="item.url" style="width: 100%;height: 100%;cursor: pointer;" alt="">
                         </el-carousel-item>
                     </el-carousel>
                 </div>
@@ -39,8 +39,8 @@ onMounted(async() => {
                     class="img-item rounded-md" 
                     v-for="item in bingWallpaperList.slice(5,8)" 
                     style="width: 95%;max-height: calc(100% / 3.1);overflow: hidden;">
-                        <img  
-                        :src="item.url" 
+                        <img
+                        v-lazy="item.url"
                         style="width: 100%;height: 100%;"
                         class="rounded-md cursor-pointer"
                         @click="openViewImg(item)"
@@ -59,7 +59,7 @@ onMounted(async() => {
                     style="width: 100%;height: 100%;overflow: hidden;">
                     <img 
                         style="width: 100%;height: 100%;cursor: pointer;"
-                        :src="item.url"
+                        v-lazy="item.url"
                         @click="openViewImg(item)"
                         alt=""
                     >

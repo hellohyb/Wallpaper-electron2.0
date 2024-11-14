@@ -2,7 +2,7 @@
 import { getCategory, getImgListByCategory } from '@renderer/utils/favorite/getFavorite';
 import { ref, watch } from 'vue';
 import ImgBox from '@renderer/components/ImgBox.vue';
-import { addCategory, cleanFavorite, delCategory, insertLocalImageToFavorite } from '@renderer/utils/favorite/setFavorite';
+import { addCategory, cleanFavorite, delCategory, delFavorite, insertLocalImageToFavorite } from '@renderer/utils/favorite/setFavorite';
 import getImageFilesFromFolder from '@renderer/utils/favorite/getLocalImages';
 import { useMessageStore } from '@renderer/stores/messageStore';
 
@@ -51,17 +51,22 @@ const favoriteCategoryName = ref('')
 const centerDialogVisible = ref(false)
 
 // 左侧分类右键事件
-const showContextmenu = ref(false)  // 显示右键菜单
+const showContextmenu = ref(false)  // 显示侧边栏右键菜单
+const showContextImgMenu = ref(false)// 显示图片右键菜单
 const dialogVisible = ref(false) // 显示确认是否删除框
 const dialogVisible2 = ref(false) // 显示确认是否清空
 const liDom = ref() // 获取收藏夹列表的Dom
 const menuDom = ref() // 右键菜单的dom
+const menuImgDom = ref() // 右键菜单的dom
 const liDomInnerText = ref() // 当前选中的收藏夹的innerText
+const activeImgInfo = ref() // 当前选中的图片信息
 // 点击右键
 const showMenu = (e,index) => { 
+    showContextImgMenu.value = false
     showContextmenu.value = true
     menuDom.value.style.top = `${e.clientY - 70}px`
     menuDom.value.style.left = `${e.clientX}px`
+    menuDom.value.style.zIndex = 999
     liDomInnerText.value = liDom.value[index].innerText;
 }
 // 右键删除事件
@@ -71,20 +76,13 @@ const delFavoriteCategory = () => {
     ElMessage({type:"success",message:"删除成功！"})
     initFavoriteCategory('默认收藏')
 }
+// 清空收藏夹
 const cleanFavoriteImg = () => {
     cleanFavorite(liDomInnerText.value)
     ElMessage({type:"success",message:`收藏夹 ${liDomInnerText.value} 已清空`})
     dialogVisible2.value = false
     initFavoriteCategory(activeList.value)
 }
-// 监听右键菜单
-watch(() => showContextmenu.value,() => {
-    if(showContextmenu.value){
-        document.addEventListener('click',() => {
-            showContextmenu.value = false
-        })
-    }
-})
 // 右键导入文件夹
 const importLocalImg = async() => {
     // liDomInnerText.value
@@ -112,6 +110,82 @@ const importLocalImg = async() => {
         });
     }
     
+}
+// 监听右键菜单
+watch(() => showContextmenu.value,() => {
+    if(showContextmenu.value){
+        document.addEventListener('click',() => {
+            showContextmenu.value = false
+        })
+    }
+})
+
+
+
+// 收藏夹图片右键菜单
+const showImgMenu = (e, item) => {
+    activeImgInfo.value = item;
+    showContextmenu.value = false;
+    showContextImgMenu.value = true;
+
+    const menuWidth = menuImgDom.value.offsetWidth;
+    const menuHeight = menuImgDom.value.offsetHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let top = e.clientY;
+    let left = e.clientX;
+
+    // 检查是否会超出右边界
+    if (left + menuWidth > windowWidth) {
+        left = windowWidth - menuWidth;
+    }
+
+    // 检查是否会超出底部边界
+    if (top + menuHeight > windowHeight) {
+        top = windowHeight - menuHeight;
+    }
+
+    // 如果菜单顶部位置过高，确保菜单显示在鼠标下方
+    if (top < 0) {
+        top = 0;
+    }
+
+    // 如果菜单左边位置过于靠左，确保菜单显示在鼠标右侧
+    if (left < 0) {
+        left = 0;
+    }
+
+    menuImgDom.value.style.top = `${top}px`;
+    menuImgDom.value.style.left = `${left}px`;
+    menuImgDom.value.style.zIndex = 999;
+};
+
+
+const delImage = () => {
+    delFavorite(activeImgInfo.value)
+}
+// 收藏夹图片右键菜单
+watch(() => showContextImgMenu.value,() => {
+    if(showContextImgMenu.value){
+        document.addEventListener('click',() => {
+            showContextImgMenu.value = false
+        })
+    }
+})
+
+
+const addLocalImage = async() => {
+    const fileList = await ipcRenderer.invoke('selectFiles')
+    if(fileList){
+        let imageNum = 0
+        fileList.forEach(item => {
+                    insertLocalImageToFavorite(item,activeList.value)
+                    imageNum++
+                })
+        ElMessage({type:"success",message:`成功导入${imageNum}张图片！`})
+        initFavoriteCategory(activeList.value)
+    }
 }
 
 </script>
@@ -180,12 +254,17 @@ const importLocalImg = async() => {
             </div>
        </div>
         <div v-if="imgList.length > 0" class="right-img flex-1 px-4 py-2 grid grid-cols-4 gap-4 auto-rows-min overflow-y-scroll">
-            <ImgBox v-for="(item,index) in imgList" :imgInfo="item" :key="`imgbox-${index}`"/>
+            <ImgBox @contextmenu="showImgMenu($event,item)" v-for="(item,index) in imgList" :imgInfo="item" :key="`imgbox-${index}`"/>
+            <div v-show="showContextImgMenu" ref="menuImgDom" class="contextmenu w-[100px] py-1 rounded-md absolute">
+                <li @click="delImage()" class="w-full list-none py-1 text-center cursor-pointer hover:btn-active">取消收藏</li>
+            </div>
         </div>
         <div v-else class="right-img flex-1 px-2 py-2 flex justify-center items-center flex-col">
             <svg t="1708757696801" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7947" width="100" height="100"><path d="M896 722.944a25.6 25.6 0 0 1 51.2 0V819.2a76.8 76.8 0 0 1-76.8 76.8H153.6A76.8 76.8 0 0 1 76.8 819.2V256A76.8 76.8 0 0 1 153.6 179.2h716.8A76.8 76.8 0 0 1 947.2 256v288.8704a25.6 25.6 0 0 1-51.2 0V256a25.6 25.6 0 0 0-25.6-25.6H153.6a25.6 25.6 0 0 0-25.6 25.6v563.2a25.6 25.6 0 0 0 25.6 25.6h716.8a25.6 25.6 0 0 0 25.6-25.6v-96.256z m-438.784-43.2128l-93.9008-77.1584-138.1888 180.9408a25.6 25.6 0 1 1-40.6528-31.0272l141.4144-185.2416a46.08 46.08 0 0 1 65.8432-7.6288l94.208 77.4656 153.9072-170.2912a46.08 46.08 0 0 1 76.1344 11.8784l126.5152 278.7328a25.6 25.6 0 0 1-46.592 21.1968L672.6144 506.88l-151.9104 168.0896a46.08 46.08 0 0 1-63.488 4.7104zM358.4 486.4a76.8 76.8 0 1 1 0-153.6 76.8 76.8 0 0 1 0 153.6z m0-51.2a25.6 25.6 0 1 0 0-51.2 25.6 25.6 0 0 0 0 51.2z" fill="#9DA7B2" p-id="7948"></path></svg>
             <span class="text-[#bfbfbf]">暂未添加壁纸</span>
         </div>
+        
+        <svg t="1731560637527" @click="addLocalImage()" title="添加壁纸" class="icon addImage" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4279" width="48" height="48"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#409EFF" p-id="4280" data-spm-anchor-id="a313x.search_index.0.i3.21e43a81eHxVft" class=""></path><path d="M713.216 462.336H310.784c-27.648 0-49.664 22.528-49.664 49.664s22.528 49.664 49.664 49.664h402.432c27.648 0 49.664-22.528 49.664-49.664s-22.528-49.664-49.664-49.664z" fill="#ffffff" p-id="4281" data-spm-anchor-id="a313x.search_index.0.i2.21e43a81eHxVft" class=""></path><path d="M462.336 310.784v402.432c0 27.648 22.528 49.664 49.664 49.664s49.664-22.528 49.664-49.664V310.784c0-27.648-22.528-49.664-49.664-49.664s-49.664 22.528-49.664 49.664z" fill="#ffffff" p-id="4282" data-spm-anchor-id="a313x.search_index.0.i1.21e43a81eHxVft" class=""></path></svg>
     </div>
     <el-dialog v-model="centerDialogVisible" title="新建收藏夹" width="500" align-center>
         <el-input v-model="favoriteCategoryName" type="text" placeholder="请输入收藏夹名" />
@@ -197,12 +276,13 @@ const importLocalImg = async() => {
         </el-button>
       </div>
     </template>
-  </el-dialog>
+    </el-dialog>
+   
 </template>
 
 <style lang="less" scoped>
 .contextmenu{
-    box-shadow: 0 0 0 1px rgb(210, 210, 210);
+    box-shadow: 0 0 0 1px rgb(223, 223, 223);
     font-size: 12px;
     background-color: #fff;
     user-select: none;
@@ -210,7 +290,17 @@ const importLocalImg = async() => {
 .favorite{
     width: 100%;
     height: calc(100vh - 100px);
+    .addImage{
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        &:hover{
+            cursor: pointer;
+            filter:contrast(2)
+        }
+    }
     .right-img{
+        transition: all .2s;
         &::-webkit-scrollbar {
                 display: none; 
                 // width: 8px;

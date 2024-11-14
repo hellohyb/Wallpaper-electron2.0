@@ -32,10 +32,9 @@ const setPaper = async(imgInfos) => {
     }
     downloading.value = false
 }
-const donwloadDir = ref(electronStore.get('config').downloadPath || null)
 // 下载壁纸
 const downloadThisImg = async(imgUrl) => {
-    let res = await downloadWallpaper(imgUrl,donwloadDir.value)
+    let res = await downloadWallpaper(imgUrl,electronStore.get('config').downloadPath)
     if(res){ 
         ElMessage({message:"下载成功！",type:"success"})
     }

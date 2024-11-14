@@ -90,7 +90,7 @@ onMounted(async () => {
         </el-radio>
           <el-radio :value="3">
             <span>本地目录:</span>
-            <span style="margin:0 2px;font-size: 12px;">{{ config.player.localPath }}</span>
+            <span style="margin:0 2px;font-size: 12px;">{{ config.player.localPath === '' ? "请先选择目录" : config.player.localPath}}</span>
             <el-button type="primary" size="small" :icon="Edit" @click="selectLocalPlayerDir()"></el-button>
             </el-radio>
         </el-radio-group>
