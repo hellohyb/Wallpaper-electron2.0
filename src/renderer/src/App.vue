@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, provide, nextTick, ref } from 'vue';
+import { provide, nextTick, ref } from 'vue';
 import Header from './components/Header.vue';
 import TopNav from './components/TopNav.vue';
 import { useRoute } from 'vue-router';
@@ -7,9 +7,11 @@ import { getNewList } from './api/getWallpaler';
 import { downloadWallpaper, mkdirsSync } from './utils/download';
 import setWallpaper from './utils/setWallpaper';
 import getDefaultDirectory from './utils/getDefaultDirectory';
+const electronStore = window.electronStore
 const isRouterActive = ref(true)
 const ipcRenderer = window.electron.ipcRenderer
 const route = useRoute();
+
 provide('reload',() => {
   isRouterActive.value = false
   nextTick(() => {
@@ -18,9 +20,9 @@ provide('reload',() => {
 })
 // 初始化收藏列表
 const initFavorite = () => {
-  let getFavorite = JSON.parse(localStorage.getItem('favorite') as any) || false
+  let getFavorite = electronStore.get("favorite") || false
   if(!getFavorite || getFavorite.length == 0){
-    localStorage.setItem('favorite',JSON.stringify([{categoryName:'默认收藏',imgList:[]}]))
+    electronStore.set('favorite',[{categoryName:'默认收藏',imgList:[]}])
   }
 }
 // 初始化缓存目录，下载目录
@@ -66,23 +68,25 @@ const initSettingConfig = async () => {
     start: false, // 开机是否启动应用
     GPU: false
   }
-  localStorage.setItem("config",JSON.stringify(config))
+  electronStore.set("config",config)
 }
-// 获取localstorage
-const sendLocalStorage = () => {
+
+const sendStorage = () => {
   ipcRenderer.send("send-config",{
-    config:JSON.parse(localStorage.getItem('config') as any),
-    favoriteList:JSON.parse(localStorage.getItem('favorite') as any)
+    config:electronStore.get('config'),
+    favoriteList:electronStore.get('favorite')
   })
 }
-onMounted(async () => {
+ 
+
+(async () => {
   initFavorite()
   await initDefaultDir()
-  if(!localStorage.getItem("config")){
+  if(!electronStore.get("config")){
     await initSettingConfig()
   }
-  sendLocalStorage()
-})
+  sendStorage()
+})();
 </script>
 
 <template>

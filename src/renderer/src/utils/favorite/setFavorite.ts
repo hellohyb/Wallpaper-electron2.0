@@ -2,10 +2,14 @@ import { ref } from "vue";
 import { useMessageStore } from '@renderer/stores/messageStore'
 import pinia from "@renderer/stores/pinia";
 const messageStore = useMessageStore(pinia);
-let favoriteAll = ref(JSON.parse(localStorage.getItem('favorite') as any)) || {}
+const electronStore = window.electronStore
+let favoriteAll = ref(electronStore.get('favorite')) || {}
+const deepClone = (value) =>{
+    return JSON.parse(JSON.stringify(value))
+}
 // 新增分类
 export function addCategory(categoryName){
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    favoriteAll.value = electronStore.get('favorite')
     let isNoSameName = true;
     for(let i = 0; i < favoriteAll.value.length; i++){
         if(favoriteAll.value[i].categoryName === categoryName){
@@ -14,7 +18,7 @@ export function addCategory(categoryName){
     }
     if(isNoSameName){
         favoriteAll.value.push({categoryName:categoryName,imgList:[]})
-        localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
+        electronStore.set('favorite',deepClone(favoriteAll.value))
         return true
     }else{
         return false
@@ -22,22 +26,22 @@ export function addCategory(categoryName){
 }
 // 删除分类
 export function delCategory(categoryName){
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    favoriteAll.value = electronStore.get('favorite')
     favoriteAll.value = favoriteAll.value.filter((item) => {
        return item.categoryName !== categoryName
     })
-    localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
+    electronStore.set('favorite',deepClone(favoriteAll.value))
     return true
 }
 // 新增收藏
 export function addFavorite(imgInfo,categoryName = '默认收藏'){
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    favoriteAll.value = electronStore.get('favorite')
     for(let i = 0; i < favoriteAll.value.length; i++){
         if(favoriteAll.value[i].categoryName == categoryName){
             favoriteAll.value[i].imgList.push(imgInfo)
         }
     }
-    localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
+    electronStore.set('favorite',deepClone(favoriteAll.value))
     return true
 }
 // 从本地导入时，格式化文件内容并保存至对应的收藏夹
@@ -53,14 +57,14 @@ export function insertLocalImageToFavorite(imageUrl,categoryName){
 }
 // 取消收藏
 export function delFavorite(imgInfo){
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    favoriteAll.value = electronStore.get('favorite')
     for(let i = 0; i < favoriteAll.value.length; i++){
             favoriteAll.value[i].imgList = favoriteAll.value[i].imgList.filter((item) => {
                 return item.id !== imgInfo.id
         })
     }
-    localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    electronStore.set('favorite',deepClone(favoriteAll.value))
+    favoriteAll.value = electronStore.get('favorite')
     // 通知收藏夹刷新
     messageStore.updateDelState(true)
     ElMessage({message:"已取消收藏",type:"success"})
@@ -68,11 +72,11 @@ export function delFavorite(imgInfo){
 }
 // 清空收藏夹内容
 export function cleanFavorite(categoryName){
-    favoriteAll.value = JSON.parse(localStorage.getItem('favorite') as any)
+    favoriteAll.value = electronStore.get('favorite')
     for(let i = 0; i < favoriteAll.value.length; i++){
         if(favoriteAll.value[i].categoryName == categoryName){
             favoriteAll.value[i].imgList = []
-            localStorage.setItem('favorite',JSON.stringify(favoriteAll.value))
+            electronStore.set('favorite',deepClone(favoriteAll.value))
             return true
         }
     }

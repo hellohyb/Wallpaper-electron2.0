@@ -1,6 +1,10 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-
+const storeSend = (action: string, key: string, value = null) => ipcRenderer.sendSync('store-send',{action, key, value})
+const electronStore:any = {
+  get:(key: string) => storeSend('get',key),
+  set:(key: string,value:any) => storeSend('set',key,value)
+}
 // Custom APIs for renderer
 const api = {}
 
@@ -11,6 +15,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('electronStore',electronStore)
   } catch (error) {
     console.error(error)
   }
@@ -19,4 +24,6 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   // @ts-ignore (define in dts)
   window.api = api
+   // @ts-ignore (define in dts)
+  window.electronStore = electronStore
 }

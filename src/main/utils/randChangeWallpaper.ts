@@ -2,6 +2,7 @@ import { ipcMain } from "electron"
 import {randChangeWallpaperByLocal, randWallpaper, randWallpaperByFavorite} from "./randWallpaper"
 const fs = require('fs');
 const path = require('path');
+
 let configs
 let favoriteList
 ipcMain.on('send-config',(_e,msg) => {

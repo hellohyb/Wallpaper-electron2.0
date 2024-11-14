@@ -4,6 +4,7 @@ import setWallpaper from '@renderer/utils/setWallpaper';
 import { addFavorite, isFavorited, delFavorite, addCategory } from '@renderer/utils/favorite/setFavorite'
 import { ref } from 'vue';
 import { getCategory } from '@renderer/utils/favorite/getFavorite';
+const electronStore = window.electronStore
 const props = defineProps({
     showView:Boolean,
     imgInfo:Object
@@ -31,7 +32,7 @@ const setPaper = async(imgInfos) => {
     }
     downloading.value = false
 }
-const donwloadDir = ref(JSON.parse(localStorage.getItem('config') as any).downloadPath || null)
+const donwloadDir = ref(electronStore.get('config').downloadPath || null)
 // 下载壁纸
 const downloadThisImg = async(imgUrl) => {
     let res = await downloadWallpaper(imgUrl,donwloadDir.value)

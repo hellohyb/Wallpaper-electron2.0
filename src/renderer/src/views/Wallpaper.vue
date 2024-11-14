@@ -6,6 +6,7 @@ const categoryList:Ref<any> = ref([])
 const categoryId:Ref<number> = ref(36)
 const imageList:Ref<any> = ref([])
 const total = ref(1)
+const electronStore = window.electronStore
 // 切换分类
 const changeCategory = async(id) => {
     imageList.value = []
@@ -49,11 +50,11 @@ const showView:Ref<boolean> = ref(false)
 const imgInfo:Ref<Object> = ref({})
 onMounted(async() => {
     // 获取分类
-    if(!localStorage.getItem('categoryList') || JSON.parse(localStorage.getItem('categoryList') as any).length < 1){
-        localStorage.setItem('categoryList',JSON.stringify(await (await getCategory()).data.data))
-        categoryList.value = JSON.parse(localStorage.getItem('categoryList') as any)
+    if(!electronStore.get('categoryList') || electronStore.get('categoryList').length < 1){
+        electronStore.set('categoryList',await (await getCategory()).data.data)
+        categoryList.value = electronStore.get('categoryList')
     }else{
-        categoryList.value = JSON.parse(localStorage.getItem('categoryList') as any)
+        categoryList.value = electronStore.get('categoryList')
     }
     changeCategory(categoryId.value)
 })

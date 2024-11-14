@@ -5,6 +5,13 @@ import { SetMouseHook } from "../utils/setMouseHook";
 import setDynamicWallpaper from "../utils/setDynamicWallpaper";
 import { createVideoWindow, createVideoWindow2 } from "../createWindow";
 let videoWindow: any = null, videoWindow2: any = null
+let store
+(async() => {
+  // 使用动态 import() 加载 electron-store
+  const module = await import('electron-store');
+  let Store = module.default;
+  store = new Store(); 
+})();
 export function ipcMainList() {
   // 打开文件夹
   ipcMain.handle('openDir', (_e,msg = null) => {
@@ -50,11 +57,7 @@ export function ipcMainList() {
       return false
     }
   })
-
-  ipcMain.on("getVideos", (_e, msg) => {
-    console.log(msg);
-
-  })
+  
   // windows设置静态壁纸
   ipcMain.handle('setwindows', async (_event, param) => {
     return setWindowsWallPaper(param.winfilepath);
@@ -110,6 +113,18 @@ export function ipcMainList() {
     if(videoWindow2){
       videoWindow2.close()
       videoWindow = null
+    }
+  })
+  // 获取electron-store
+  ipcMain.on('store-send',(event,params) => {
+    const {action, key, value} = params
+    switch(action){
+      case 'get':
+        event.returnValue = store.get(key);
+        break;
+      case 'set':
+        event.returnValue = store.set(key,value);
+        break;
     }
   })
 }

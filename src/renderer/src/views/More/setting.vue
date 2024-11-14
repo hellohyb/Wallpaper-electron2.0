@@ -2,7 +2,8 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import { Edit, Folder,InfoFilled } from '@element-plus/icons-vue'
 const ipcRenderer = window.electron.ipcRenderer
-const oldConfig = JSON.parse(localStorage.getItem("config") as any)
+const electronStore = window.electronStore
+const oldConfig = electronStore.get("config")
 const config = reactive(oldConfig)
 // 修改下载文件夹
 const selectDir = async () => {
@@ -22,12 +23,12 @@ const selectLocalPlayerDir = async () => {
 }
 // 保存修改
 const saveSetting = () => {
-  localStorage.setItem('config', JSON.stringify(config))
+  electronStore.set('config', JSON.parse(JSON.stringify(config)))
 }
 let favoriteList = ref()
 // 获取收藏夹信息，过滤掉为空的收藏夹
 const getFavoriteList = () => {
-    favoriteList.value = JSON.parse(localStorage.getItem("favorite") as any).filter((item) => {
+    favoriteList.value = electronStore.get("favorite").filter((item) => {
       return item.imgList.length != 0
     })
 }
