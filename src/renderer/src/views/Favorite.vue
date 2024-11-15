@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { getCategory, getImgListByCategory } from '@renderer/utils/favorite/getFavorite';
-import { onMounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import ImgBox from '@renderer/components/ImgBox.vue';
 import { addCategory, cleanFavorite, delCategory, delFavorite, insertLocalImageToFavorite } from '@renderer/utils/favorite/setFavorite';
 import getImageFilesFromFolder from '@renderer/utils/favorite/getLocalImages';
@@ -200,43 +200,35 @@ const favoriteDom = ref()
 //     }
 //     return false
 // }
-const listenerPaste = () => {
-    document.body.addEventListener("keydown",async(event) => {
-        const isPaste = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v';
-        if (isPaste && route.path === '/favorite') {
+const pasteIntofavorite = async (event) => {
+    const isPaste = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v';
+        if (isPaste) {
             event.preventDefault();
             try{
                 const ress = await ipcRenderer.invoke("getPaste",window.electronStore.get('config').downloadPath)
                 loading.value = true
                 if(ress){
-                loading.value = false
-                insertLocalImageToFavorite(ress,activeList.value)
-                ElMessage({type:"success",message:`成功导入图片！`})
-                initFavoriteCategory(activeList.value)
-            }else{
-                loading.value = false
-                ElMessage({type:"error",message:"图片导入失败"})
-            }
+                    loading.value = false
+                    insertLocalImageToFavorite(ress,activeList.value)
+                    ElMessage({type:"success",message:`成功导入图片！`})
+                    initFavoriteCategory(activeList.value)
+                }else{
+                    loading.value = false
+                    ElMessage({type:"error",message:"图片导入失败"})
+                }
             }catch{
                 loading.value = false
             }
-            // 设置一个延迟，确保 `keydown` 只处理一次粘贴事件
-            // if(isImage(pasteContent)){
-            //     loading.value = true
-            //    const res = await downloadWallpaper(pasteContent,window.electronStore.get('config').downloadPath)
-            //     if(res){
-            //         insertLocalImageToFavorite(res,activeList.value)
-            //         ElMessage({type:"success",message:`成功导入图片！`})
-            //         initFavoriteCategory(activeList.value)
-            //     }
-            //     loading.value = false
-            // }  
         }
-    })
+    
 }
 onMounted(async() => {
-    listenerPaste()
+    document.body.addEventListener("keydown",pasteIntofavorite)
 });
+onBeforeUnmount(() => {
+    // 移除事件监听器
+    document.body.removeEventListener("keydown", pasteIntofavorite);
+})
 
 </script>
 

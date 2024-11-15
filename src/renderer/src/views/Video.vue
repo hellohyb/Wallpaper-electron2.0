@@ -24,7 +24,7 @@ watch(filePath, (newPath) => {
             }
         }
         else if(verifyFile(newPath) === 'video'){
-            videoRef.value.requestFullscreen();
+            // videoRef.value.requestFullscreen();
             showVideo.value = true
             // 重新加载视频
             videoRef.value.load()
