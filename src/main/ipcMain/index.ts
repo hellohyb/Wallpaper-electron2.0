@@ -148,7 +148,7 @@ export function ipcMainList() {
   ipcMain.handle('getPaste',(_e,folderPath) => {
     return new Promise(reslove => {
       const image = clipboard.readImage();
-      const newFilePath = folderPath + `/${Date.now()}.jpeg`
+      const newFilePath = path.join(folderPath, `${Date.now()}.jpeg`);
       if (!image.isEmpty()) {
         const jpegBuffer = image.toJPEG(100);
         fs.writeFile(newFilePath, jpegBuffer, (err) => {
