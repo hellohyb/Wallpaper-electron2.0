@@ -6,7 +6,6 @@ import { addCategory, cleanFavorite, delCategory, delFavorite, insertLocalImageT
 import getImageFilesFromFolder from '@renderer/utils/favorite/getLocalImages';
 import { useMessageStore } from '@renderer/stores/messageStore';
 import { useRoute } from 'vue-router';
-import { downloadWallpaper } from '@renderer/utils/download';
 const route = useRoute();
 const messageStore = useMessageStore();
 const loading = ref(false)
@@ -192,22 +191,22 @@ const addLocalImage = async() => {
     }
 }
 const favoriteDom = ref()
-const isImage = (filepath) => {
-    let type = ['png','jpg','jpeg']
-    if(type.includes(filepath.slice(filepath.lastIndexOf('.')+1,filepath.length).toLowerCase())
-        && filepath.slice(0,4) === 'http'
-    ){
-        return true
-    }
-    return false
-}
+// const isImage = (filepath) => {
+//     let type = ['png','jpg','jpeg']
+//     if(type.includes(filepath.slice(filepath.lastIndexOf('.')+1,filepath.length).toLowerCase())
+//         && filepath.slice(0,4) === 'http'
+//     ){
+//         return true
+//     }
+//     return false
+// }
 const listenerPaste = () => {
-    document.addEventListener("keydown",async(event) => {
+    document.body.addEventListener("keydown",async(event) => {
         const isPaste = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v';
         if (isPaste && route.path === '/favorite') {
-            event.preventDefault(); // 如果不希望插入到文档中，可以取消默认行为
-            const ress = await ipcRenderer.invoke("getPaste",window.electronStore.get('config').downloadPath)
+            event.preventDefault();
             try{
+                const ress = await ipcRenderer.invoke("getPaste",window.electronStore.get('config').downloadPath)
                 loading.value = true
                 if(ress){
                 loading.value = false
@@ -221,7 +220,7 @@ const listenerPaste = () => {
             }catch{
                 loading.value = false
             }
-            
+            // 设置一个延迟，确保 `keydown` 只处理一次粘贴事件
             // if(isImage(pasteContent)){
             //     loading.value = true
             //    const res = await downloadWallpaper(pasteContent,window.electronStore.get('config').downloadPath)
@@ -236,19 +235,7 @@ const listenerPaste = () => {
     })
 }
 onMounted(async() => {
-        listenerPaste()
-//     document.addEventListener('dragover', (e) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-// })
-// document.addEventListener('drop', (e:any) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     const file = e.dataTransfer.files[0];  // 获取拖放的文件对象
-//     console.log(file);
-// });
-
-
+    listenerPaste()
 });
 
 </script>
