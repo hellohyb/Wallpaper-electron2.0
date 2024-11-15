@@ -1,5 +1,6 @@
 const fs = require('fs')
 const http = require('http')
+const https = require('https')
 const path = require('path')
 import getDefaultDirectory from "./getDefaultDirectory"
 // 新建文件夹
@@ -24,7 +25,8 @@ export async function downloadWallpaper(imgUrl,dirname = null){
     if(dirname_ok && mkdirsSync(dirname_ok)){
       // 下载文件
       return new Promise((resolve, _reject) => {
-        http.get(imgUrl,(res) => {
+        const client = imgUrl.startsWith('https') ? https : http;
+        client.get(imgUrl,(res) => {
           const fileStream = fs.createWriteStream(`${dirname_ok}/${fileName}`)
           res.pipe(fileStream).on("close",() => {
             resolve(`${dirname_ok}/${fileName}`)
@@ -34,4 +36,21 @@ export async function downloadWallpaper(imgUrl,dirname = null){
     }else{
       return false
     }
+}
+
+export async function saveImageFromDataURL(dataURL, filePath) {
+  // 去掉 dataURL 的头部 `data:image/png;base64,`
+  const base64Data = dataURL.replace(/^data:image\/\w+;base64,/, '');
+  const buffer = Buffer.from(base64Data, 'base64');
+  const filePaths = filePath + `/${Date.now()+Math.random()*(10000-99999)+99999}.jpg`
+  return new Promise(reslove => {
+    fs.writeFile(filePaths, buffer, (err) => {
+      if (err) {
+        reslove(false)
+      } else {
+        reslove(filePaths)
+      }
+    });
+  })
+  
 }

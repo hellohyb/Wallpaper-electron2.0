@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { getCategory, getImgListByCategory } from '@renderer/utils/favorite/getFavorite';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import ImgBox from '@renderer/components/ImgBox.vue';
 import { addCategory, cleanFavorite, delCategory, delFavorite, insertLocalImageToFavorite } from '@renderer/utils/favorite/setFavorite';
 import getImageFilesFromFolder from '@renderer/utils/favorite/getLocalImages';
 import { useMessageStore } from '@renderer/stores/messageStore';
-
+import { useRoute } from 'vue-router';
+import { downloadWallpaper } from '@renderer/utils/download';
+const route = useRoute();
 const messageStore = useMessageStore();
+const loading = ref(false)
 watch(() => messageStore.deleteImgBox,(_newVal,_oldVal) => {
     if(_newVal === true){
         initFavoriteCategory(activeList.value)
@@ -88,6 +91,7 @@ const importLocalImg = async() => {
     // liDomInnerText.value
     const DirPath = await ipcRenderer.invoke('selectDir')
     if(DirPath){
+        loading.value = true
         getImageFilesFromFolder(DirPath).then((imageFiles:any) => {
             let imageNum = 0
             if(imageFiles.length > 0){
@@ -96,9 +100,11 @@ const importLocalImg = async() => {
                     imageNum++
                 })
                 ElMessage({type:"success",message:`成功导入${imageNum}张图片！`})
+                loading.value = false
                 
             }else{
                 ElMessage({type:"error",message:`文件夹图片为空！或者图片格式不支持`})
+                loading.value = false
             }
             setTimeout(() => {
                 initFavoriteCategory(activeList.value)
@@ -119,7 +125,6 @@ watch(() => showContextmenu.value,() => {
         })
     }
 })
-
 
 
 // 收藏夹图片右键菜单
@@ -173,8 +178,7 @@ watch(() => showContextImgMenu.value,() => {
         })
     }
 })
-
-
+// 文件拖动
 const addLocalImage = async() => {
     const fileList = await ipcRenderer.invoke('selectFiles')
     if(fileList){
@@ -187,11 +191,70 @@ const addLocalImage = async() => {
         initFavoriteCategory(activeList.value)
     }
 }
+const favoriteDom = ref()
+const isImage = (filepath) => {
+    let type = ['png','jpg','jpeg']
+    if(type.includes(filepath.slice(filepath.lastIndexOf('.')+1,filepath.length).toLowerCase())
+        && filepath.slice(0,4) === 'http'
+    ){
+        return true
+    }
+    return false
+}
+const listenerPaste = () => {
+    document.addEventListener("keydown",async(event) => {
+        const isPaste = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v';
+        if (isPaste && route.path === '/favorite') {
+            event.preventDefault(); // 如果不希望插入到文档中，可以取消默认行为
+            const ress = await ipcRenderer.invoke("getPaste",window.electronStore.get('config').downloadPath)
+            try{
+                loading.value = true
+                if(ress){
+                loading.value = false
+                insertLocalImageToFavorite(ress,activeList.value)
+                ElMessage({type:"success",message:`成功导入图片！`})
+                initFavoriteCategory(activeList.value)
+            }else{
+                loading.value = false
+                ElMessage({type:"error",message:"图片导入失败"})
+            }
+            }catch{
+                loading.value = false
+            }
+            
+            // if(isImage(pasteContent)){
+            //     loading.value = true
+            //    const res = await downloadWallpaper(pasteContent,window.electronStore.get('config').downloadPath)
+            //     if(res){
+            //         insertLocalImageToFavorite(res,activeList.value)
+            //         ElMessage({type:"success",message:`成功导入图片！`})
+            //         initFavoriteCategory(activeList.value)
+            //     }
+            //     loading.value = false
+            // }  
+        }
+    })
+}
+onMounted(async() => {
+        listenerPaste()
+//     document.addEventListener('dragover', (e) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+// })
+// document.addEventListener('drop', (e:any) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     const file = e.dataTransfer.files[0];  // 获取拖放的文件对象
+//     console.log(file);
+// });
+
+
+});
 
 </script>
 
 <template>
-    <div class="favorite flex">
+    <div v-loading="loading" element-loading-text="正在导入图片..." class="favorite flex" ref="favoriteDom">
        <div class="left-menu h-[100%] w-[130px] relative">
         <ul class="h-[100%] w-[100%] !pl-0 flex justify-start items-center flex-col ">
             <li 
@@ -301,6 +364,7 @@ const addLocalImage = async() => {
     }
     .right-img{
         transition: all .2s;
+        user-select: none;
         &::-webkit-scrollbar {
                 display: none; 
                 // width: 8px;

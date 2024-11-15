@@ -1,5 +1,6 @@
-import { app, dialog, ipcMain, shell } from "electron";
+import { app, clipboard, dialog, ipcMain, shell } from "electron";
 import path from "path";
+import fs from 'fs'
 import setWindowsWallPaper from "../utils/setwindows";
 import { SetMouseHook } from "../utils/setMouseHook";
 import setDynamicWallpaper from "../utils/setDynamicWallpaper";
@@ -13,7 +14,7 @@ let store
   store = new Store(); 
 })();
 export function ipcMainList() {
-  // 打开文件夹
+  // 打开文件夹或文件
   ipcMain.handle('openDir', (_e,msg = null) => {
     let dirPath
     if(msg === null){
@@ -84,8 +85,8 @@ export function ipcMainList() {
     }
   })
   // windows macos设置动态壁纸
-  ipcMain.handle('setDynamicWin', async (_e) => {
-    const filepath = await openFileDialog();
+  ipcMain.handle('setDynamicWin', async (_e,filePaths = null) => {
+    const filepath = filePaths === null ? await openFileDialog() : [filePaths];
     if (filepath) {
       if (process.platform === 'win32') {
         // 如果播放窗口未打开
@@ -141,6 +142,27 @@ export function ipcMainList() {
         event.returnValue = store.set(key,value);
         break;
     }
+  })
+
+  // 监听剪切板内容
+  ipcMain.handle('getPaste',(_e,folderPath) => {
+    return new Promise(reslove => {
+      const image = clipboard.readImage();
+      const newFilePath = folderPath + `/${Date.now()+Math.random()*(10000-99999)+99999}.jpeg`
+      if (!image.isEmpty()) {
+        const jpegBuffer = image.toJPEG(100);
+        fs.writeFile(newFilePath, jpegBuffer, (err) => {
+          if (!err) {
+            reslove(newFilePath)
+          }
+        });
+      }
+    })
+    
+  })
+  // 获取剪切板图片文件
+  ipcMain.handle('getFilePaste',(_e) => {
+    
   })
 }
 

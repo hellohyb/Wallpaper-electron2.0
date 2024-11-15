@@ -28,4 +28,7 @@ declare module 'vue' {
     TopNav: typeof import('./src/components/TopNav.vue')['default']
     ViewImg: typeof import('./src/components/ViewImg.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }

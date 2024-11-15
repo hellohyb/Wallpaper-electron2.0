@@ -77,8 +77,26 @@ const sendStorage = () => {
     favoriteList:electronStore.get('favorite')
   })
 }
- 
+ipcRenderer.on("dragLoaclImage",(_e,files) => {
+  if(files.length === 1){
+    if(files[0].slice(files[0].lastIndexOf('.') + 1,files[0].length).toLowerCase() === 'mp4'){
+      ipcRenderer.invoke("setDynamicWin",files[0])
+    }
+  }
+  // let img = ['jpg','png','jpeg']
+  // let res = true
+  // for(let i = 0; i < files.length; i++){
+  //   if(!img.includes(files[i].slice(files[i].lastIndexOf('.') + 1,files[i].length).toLowerCase())){
+  //     res = false
+  //     break;
+  //   }
+  // }
+  // if(res){
 
+  // }else{
+
+  // }
+});
 (async () => {
   initFavorite()
   await initDefaultDir()

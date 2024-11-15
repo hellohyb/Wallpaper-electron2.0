@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow, Tray, Menu, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/iconTray.png?asset'
@@ -10,7 +10,6 @@ app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
-
 let mainWindow
 let menuSwitch = false;
 let startChanging = false;
@@ -142,6 +141,10 @@ app.whenReady().then(() => {
   tray.on('right-click',() => {
     setMenu()
   })
+  tray.on('drop-files', (_event, files) => {
+    // 这里可以添加对文件的处理逻辑
+    mainWindow.webContents.send("dragLoaclImage",files)
+  });
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
   app.on('browser-window-created', (_, window) => {
