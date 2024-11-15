@@ -5,6 +5,7 @@ import { addFavorite, isFavorited, delFavorite, addCategory } from '@renderer/ut
 import { ref } from 'vue';
 import { getCategory } from '@renderer/utils/favorite/getFavorite';
 const electronStore = window.electronStore
+const ipcRenderer = window.electron.ipcRenderer
 const props = defineProps({
     showView:Boolean,
     imgInfo:Object
@@ -76,6 +77,9 @@ const addFavoriteCategory = () => {
         }
    }
 }
+const openImageFolder = (url) => {
+    ipcRenderer.invoke("openDir",url.slice(7,url.lastIndexOf('/')))
+}
 </script>
 
 <template>
@@ -105,6 +109,10 @@ const addFavoriteCategory = () => {
             <div v-if="!props.imgInfo!.local" @click="downloadThisImg(props.imgInfo!.url)" class="icons w-[80px] h-[80px] flex flex-col justify-center items-center">
                 <svg t="1708601249467" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13704" width="40" height="40"><path d="M892.5 879.2h-761c-18.4 0-33.3-14.9-33.3-33.3V679.5c0-18.4 14.9-33.3 33.3-33.3h30c18.4 0 33.3 14.9 33.3 33.3 0 4.5-0.9 8.9-2.6 12.8l-13 64.8c0 18.4 14.9 33.3 33.3 33.3h599c18.4 0 33.3-14.9 33.3-33.3l-13-64.8c-1.7-3.9-2.6-8.3-2.6-12.8 0-18.4 14.9-33.3 33.3-33.3h30c18.4 0 33.3 14.9 33.3 33.3v166.4c0 18.4-14.9 33.3-33.3 33.3z m-66.6-500.3v0.6c2.6 1.1 4.4 3.7 4.4 6.7s-1.8 5.6-4.4 6.7v0.4L520.7 706.1h-0.4c-1.1 2.6-3.7 4.4-6.7 4.4s-5.6-1.8-6.7-4.4h-0.4L201.4 393.2v-0.4c-2.6-1.1-4.4-3.7-4.4-6.7s1.8-5.6 4.4-6.7v-0.6h-13.9 207v-51c0-18.4 14.9-33.3 33.3-33.3h168.6c18.4 0 33.3 14.9 33.3 33.3v51H840h-14.1z m-224-115.4H422.1c-15.3 0-27.7-12.4-27.7-27.7s12.4-27.7 27.7-27.7h179.7c15.3 0 27.7 12.4 27.7 27.7s-12.3 27.7-27.6 27.7z m11-84.3H411.1c-9.2 0-16.6-7.5-16.6-16.6 0-9.2 7.5-16.6 16.6-16.6H613c9.2 0 16.6 7.5 16.6 16.6 0 9.2-7.5 16.6-16.7 16.6z" fill="#2c2c2c" p-id="13705"></path></svg>
                 <span class="mt-1">下载</span>
+            </div>
+            <div v-else @click="openImageFolder(props.imgInfo!.url)" class="icons w-[80px] h-[80px] flex flex-col justify-center items-center">
+                <svg t="1731649177192" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4308" width="40" height="40"><path d="M810.666667 85.333333a85.333333 85.333333 0 0 1 85.333333 85.333334v152.021333c36.821333 9.493333 64 42.88 64 82.645333v405.333334a128 128 0 0 1-128 128H192a128 128 0 0 1-128-128V298.666667a85.376 85.376 0 0 1 64-82.645334V170.666667a85.333333 85.333333 0 0 1 85.333333-85.333334h597.333334zM128.149333 296.170667L128 298.666667v512a64 64 0 0 0 60.245333 63.893333L192 874.666667h640a64 64 0 0 0 63.893333-60.245334L896 810.666667V405.333333a21.333333 21.333333 0 0 0-18.837333-21.184L874.666667 384H638.165333l-122.069333-101.717333a21.333333 21.333333 0 0 0-10.688-4.736l-2.986667-0.213334H149.333333a21.333333 21.333333 0 0 0-21.184 18.837334zM535.189333 213.333333l127.978667 106.666667H832V170.666667a21.333333 21.333333 0 0 0-18.837333-21.184L810.666667 149.333333H213.333333a21.333333 21.333333 0 0 0-21.184 18.837334L192 170.666667v42.666666h343.168z" fill="#2c2c2c" p-id="4309"></path></svg>
+                <span class="mt-1 text-[14px]">所在文件夹</span>
             </div>
 
             <!-- 设为壁纸 -->
