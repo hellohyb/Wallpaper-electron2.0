@@ -47,12 +47,14 @@ export function createVideoWindow2() {
         x:x,
         y:y,
         width: width,
-        height: height,
+        height: height + 40,
         frame: false,
         transparent: true,
         resizable: false,
-        simpleFullscreen:true,
+        skipTaskbar:true,
+        type:'desktop',
         autoHideMenuBar: true,
+        enableLargerThanScreen:true,
         show: false,
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
@@ -63,6 +65,8 @@ export function createVideoWindow2() {
         }
     })
     videoWindow2.setHasShadow(false)
+    videoWindow2.setVisibleOnAllWorkspaces(true)
+    videoWindow2.setFullScreenable(false)
     app.dock.hide()
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
         videoWindow2.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/#/video')
@@ -74,7 +78,7 @@ export function createVideoWindow2() {
     })
     // 在窗口加载后获取 PID
     videoWindow2.webContents.on('did-finish-load', () => {
-        setMacDynamicWallpaper(process.pid);
+        // setMacDynamicWallpaper(process.pid);
     });
     videoWindow2.on('closed', () => {
         videoWindow2 = null;  // 确保清理引用
