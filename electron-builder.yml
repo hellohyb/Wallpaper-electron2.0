@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: wallpaper
+productName: Starry Wallpaper
 directories:
   buildResources: build
 files:
@@ -12,11 +12,14 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: wallpaper
+  executableName: StarryWallpaper
+  icon: "resources/ico.ico"
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
@@ -26,6 +29,7 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  icon: "resources/ico.icns"
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:

@@ -2,8 +2,6 @@ import { is } from "@electron-toolkit/utils"
 import { app, BrowserWindow, screen } from "electron"
 import { join } from "path"
 import { UnhookMouse } from "../utils/setMouseHook"
-import setMacDynamicWallpaper from "../utils/setMacDynamicWallpaper"
-
 // windows动态壁纸窗口
 export function createVideoWindow() {
     const videoWindow = new BrowserWindow({
