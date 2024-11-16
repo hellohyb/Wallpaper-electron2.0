@@ -235,11 +235,11 @@ onBeforeUnmount(() => {
 <template>
     <div v-loading="loading" element-loading-text="正在导入图片..." class="favorite flex" ref="favoriteDom">
        <div class="left-menu h-[100%] w-[130px] relative">
-        <ul class="h-[100%] w-[100%] !pl-0 flex justify-start items-center flex-col ">
+        <ul class="w-[100%] !pl-0 flex flex-col justify-start items-center overflow-y-auto ">
             <li 
                 v-for="(item,index) in categoryList" 
                 :key="`cate-${index}`"
-                class="list-items hover:btn-active cursor-pointer w-[90%] flex justify-start items-center mb-2 py-1 rounded-md overflow-hidden"
+                class="list-items hover:btn-active cursor-pointer w-[90%] flex-shrink-0 flex justify-start items-center mb-2 py-1 rounded-md overflow-hidden"
                 @click="changeCategory(item)"
                 :class="{'btn-active':item == activeList}"
                 @contextmenu="showMenu($event,index)"
@@ -360,9 +360,13 @@ onBeforeUnmount(() => {
             list-style: none;
         }
         ul{
-            overflow-y: scroll;
             &::-webkit-scrollbar {
-                display: none; 
+                // display: none; 
+                width: 4px;
+            }
+            &::-webkit-scrollbar-thumb{
+                background-color: #7ebbf7;
+                border-radius: 5px;
             }
         }
         
