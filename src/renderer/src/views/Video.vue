@@ -54,7 +54,7 @@ document.title = "videoWallpaper"
 
 <template>
     <div class="contentss" scroll="no">
-        <video style="object-fit: fill; width: 100%;height: 95vh;" v-show="showVideo" ref="videoRef" autoplay muted loop controls="false" class="video">
+        <video style="object-fit: fill; width: 100%;height: 95vh;" v-show="showVideo" ref="videoRef" autoplay muted loop class="video">
             <source :src="filePath" type="video/mp4">
             Your browser does not support the video tag.
         </video>
