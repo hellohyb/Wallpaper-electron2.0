@@ -6,6 +6,7 @@ import { UnhookMouse } from './utils/setMouseHook'
 import { ipcMainList, getVideoWindow } from './ipcMain'
 import {randWallpaper} from './utils/randWallpaper'
 import { startRandChangeWallpaper, stopRandChangeWallpaper } from './utils/randChangeWallpaper'
+import initConfig from './utils/initConfig'
 app.commandLine.appendSwitch('disable-web-security');
 // GPU加速
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
@@ -33,7 +34,6 @@ function createWindow(): void {
       webSecurity: false
     }
   })
-
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -54,7 +54,7 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-
+initConfig()
 ipcMainList();
 Menu.setApplicationMenu(Menu.buildFromTemplate([]))
 let tray: any

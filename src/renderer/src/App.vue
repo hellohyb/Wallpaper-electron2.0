@@ -4,10 +4,8 @@ import Header from './components/Header.vue';
 import TopNav from './components/TopNav.vue';
 import { useRoute } from 'vue-router';
 import { getNewList } from './api/getWallpaler';
-import { downloadWallpaper, mkdirsSync } from './utils/download';
+import { downloadWallpaper } from './utils/download';
 import setWallpaper from './utils/setWallpaper';
-import getDefaultDirectory from './utils/getDefaultDirectory';
-const electronStore = window.electronStore
 const isRouterActive = ref(true)
 const ipcRenderer = window.electron.ipcRenderer
 const route = useRoute();
@@ -18,18 +16,6 @@ provide('reload',() => {
     isRouterActive.value = true
   })
 })
-// 初始化收藏列表
-const initFavorite = () => {
-  let getFavorite = electronStore.get("favorite") || false
-  if(!getFavorite || getFavorite.length == 0){
-    electronStore.set('favorite',[{categoryName:'默认收藏',imgList:[]}])
-  }
-}
-// 初始化缓存目录，下载目录
-const initDefaultDir = async () => {
-  const paths = await getDefaultDirectory()
-  mkdirsSync(paths)
-}
 
 // 监听菜单栏随机壁纸设置(壁纸库)
 ipcRenderer.on('getRandImgUrl',async (_e,msg) => {
@@ -52,31 +38,7 @@ ipcRenderer.on('setWallpaperByLocal',async(_e,filePath) => {
     await setWallpaper(filePath)
   }
 })
-// 初始化设置项
-const initSettingConfig = async () => {
-  const config = {
-    downloadPath: await getDefaultDirectory(), // 下载地址
-    cachePath: await getDefaultDirectory(), // 缓存地址
-    player:{
-      no:1,           // 1壁纸库随机，2收藏夹， 3本地目录
-      localPath:'',   // 本地目录路径
-      favoriteName:'默认收藏',    //  收藏夹名
-      order:1,        // 1顺序，0随机
-      changeTime: 10, // 壁纸切换间隔
-    },
-    closeWindow: 0, // 关闭窗口时：1:最小化，0:直接退出
-    start: false, // 开机是否启动应用
-    GPU: false
-  }
-  electronStore.set("config",config)
-}
 
-const sendStorage = () => {
-  ipcRenderer.send("send-config",{
-    config:electronStore.get('config'),
-    favoriteList:electronStore.get('favorite')
-  })
-}
 ipcRenderer.on("dragLoaclImage",(_e,files) => {
   if(files.length === 1){
     if(files[0].slice(files[0].lastIndexOf('.') + 1,files[0].length).toLowerCase() === 'mp4'){
@@ -97,14 +59,6 @@ ipcRenderer.on("dragLoaclImage",(_e,files) => {
 
   // }
 });
-(async () => {
-  initFavorite()
-  await initDefaultDir()
-  if(!electronStore.get("config")){
-    await initSettingConfig()
-  }
-  sendStorage()
-})();
 </script>
 
 <template>

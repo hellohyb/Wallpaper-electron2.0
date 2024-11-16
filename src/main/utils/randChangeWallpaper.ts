@@ -1,10 +1,19 @@
 import { ipcMain } from "electron"
 import {randChangeWallpaperByLocal, randWallpaper, randWallpaperByFavorite} from "./randWallpaper"
-const fs = require('fs');
-const path = require('path');
-
+import fs from 'fs';
+import path from 'path';
+let store
 let configs
 let favoriteList
+(async() => {
+  // 使用动态 import() 加载 electron-store
+  const module = await import('electron-store');
+  let Store = module.default;
+  store = new Store();
+  configs = store.get("config")
+  favoriteList = store.get('favorite') 
+})();
+
 ipcMain.on('send-config',(_e,msg) => {
     configs = msg.config
     favoriteList = msg.favoriteList
