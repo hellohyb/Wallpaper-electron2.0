@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Tray, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/start32.png?asset'
+import icon from '../../resources/trayIcon/tray32-2.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import { ipcMainList, getVideoWindow } from './ipcMain'
 import {randWallpaper} from './utils/randWallpaper'
