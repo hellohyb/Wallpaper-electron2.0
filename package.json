@@ -1,5 +1,5 @@
 {
-  "name": "stary-wallpaper",
+  "name": "starry-wallpaper",
   "version": "1.0.0",
   "description": "A wallpaper application for windows and macos",
   "main": "./out/main/index.js",
