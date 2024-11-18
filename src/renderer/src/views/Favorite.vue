@@ -1,20 +1,41 @@
 <script lang="ts" setup>
 import { getCategory, getImgListByCategory } from '@renderer/utils/favorite/getFavorite';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Delete } from '@element-plus/icons-vue'
 import ImgBox from '@renderer/components/ImgBox.vue';
 import { addCategory, cleanFavorite, delCategory, delFavorite, insertLocalImageToFavorite } from '@renderer/utils/favorite/setFavorite';
 import getImageFilesFromFolder from '@renderer/utils/favorite/getLocalImages';
 import { useMessageStore } from '@renderer/stores/messageStore';
 import { useRoute } from 'vue-router';
+import createSelectBox from '@renderer/utils/favorite/createSelectBox';
 const route = useRoute();
 const messageStore = useMessageStore();
 const loading = ref(false)
-watch(() => messageStore.deleteImgBox,(_newVal,_oldVal) => {
-    if(_newVal === true){
+// 监听pinia内容变化
+watch(() => ({
+    deleteImgBox:messageStore.deleteImgBox,
+    showEdits:messageStore.showEdit,
+    deleteNum:messageStore.deleteNum}),
+    (_newVal,_oldVal) => {
+    if(_newVal.deleteImgBox === true){
         initFavoriteCategory(activeList.value)
         messageStore.updateDelState(false)
     }
+    if(_newVal.deleteNum.length === 0){
+        messageStore.showEdits(false)
+    }
+    if(_newVal.showEdits === false){
+        showEdit.value = false
+        // messageStore.deleteNum = []
+    }
+    showEdit.value = _newVal.showEdits
+    editNum.value = _newVal.deleteNum
 })
+const showEdit = ref(false)
+const editNum = ref([])
+const closeEdit = () => {
+    messageStore.showEdits(false)
+}
 const ipcRenderer = window.electron.ipcRenderer
 // 获取总的收藏夹
 const categoryList = ref(getCategory())
@@ -54,17 +75,13 @@ const centerDialogVisible = ref(false)
 
 // 左侧分类右键事件
 const showContextmenu = ref(false)  // 显示侧边栏右键菜单
-const showContextImgMenu = ref(false)// 显示图片右键菜单
 const dialogVisible = ref(false) // 显示确认是否删除框
 const dialogVisible2 = ref(false) // 显示确认是否清空
 const liDom = ref() // 获取收藏夹列表的Dom
 const menuDom = ref() // 右键菜单的dom
-const menuImgDom = ref() // 右键菜单的dom
 const liDomInnerText = ref() // 当前选中的收藏夹的innerText
-const activeImgInfo = ref() // 当前选中的图片信息
 // 点击右键
 const showMenu = (e,index) => { 
-    showContextImgMenu.value = false
     showContextmenu.value = true
     menuDom.value.style.top = `${e.clientY - 70}px`
     menuDom.value.style.left = `${e.clientX}px`
@@ -124,59 +141,14 @@ watch(() => showContextmenu.value,() => {
         })
     }
 })
-
-
-// 收藏夹图片右键菜单
-const showImgMenu = (e, item) => {
-    activeImgInfo.value = item;
-    showContextmenu.value = false;
-    showContextImgMenu.value = true;
-
-    const menuWidth = menuImgDom.value.offsetWidth;
-    const menuHeight = menuImgDom.value.offsetHeight;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    let top = e.clientY;
-    let left = e.clientX;
-
-    // 检查是否会超出右边界
-    if (left + menuWidth > windowWidth) {
-        left = windowWidth - menuWidth;
-    }
-
-    // 检查是否会超出底部边界
-    if (top + menuHeight > windowHeight) {
-        top = windowHeight - menuHeight;
-    }
-
-    // 如果菜单顶部位置过高，确保菜单显示在鼠标下方
-    if (top < 0) {
-        top = 0;
-    }
-
-    // 如果菜单左边位置过于靠左，确保菜单显示在鼠标右侧
-    if (left < 0) {
-        left = 0;
-    }
-
-    menuImgDom.value.style.top = `${top}px`;
-    menuImgDom.value.style.left = `${left}px`;
-    menuImgDom.value.style.zIndex = 999;
-};
-
-
 const delImage = () => {
-    delFavorite(activeImgInfo.value)
+    let num  = messageStore.deleteNum.length
+    messageStore.deleteNum.forEach((item) => {
+        delFavorite(item,false)
+    })
+    ElMessage({type:"success",message:`已取消收藏${num}张图片`})
+    messageStore.showEdits(false)
 }
-// 收藏夹图片右键菜单
-watch(() => showContextImgMenu.value,() => {
-    if(showContextImgMenu.value){
-        document.addEventListener('click',() => {
-            showContextImgMenu.value = false
-        })
-    }
-})
 // 文件拖动
 const addLocalImage = async() => {
     const fileList = await ipcRenderer.invoke('selectFiles')
@@ -202,7 +174,7 @@ const favoriteDom = ref()
 // }
 const pasteIntofavorite = async (event) => {
     const isPaste = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v';
-        if (isPaste) {
+        if (isPaste && route.path === '/favorite') {
             event.preventDefault();
             try{
                 const ress = await ipcRenderer.invoke("getPaste",window.electronStore.get('config').downloadPath)
@@ -222,12 +194,39 @@ const pasteIntofavorite = async (event) => {
         }
     
 }
-onMounted(async() => {
+const rightImgDom = ref()
+let itemList
+watch(() => rightImgDom.value,() => {
+    if(rightImgDom.value){
+        createSelectBox(rightImgDom.value,itemList);
+    }
+})
+const showEditFalse = (event) => {
+    if(messageStore.suppressClick){
+        messageStore.suppressClick = false; // 重置标志位
+        event.preventDefault(); // 阻止默认行为
+        return; // 阻止触发 click 逻辑
+    }else{
+        if(showEdit.value){
+            messageStore.showEdits(false)
+        }
+    }
+}
+// 点击编辑栏时阻止全局点击事件
+const imgEdit = () => {
+    messageStore.suppressClick = true; // 标记阻止点击事件
+    setTimeout(() => messageStore.suppressClick = false, 0); // 重置标志位，确保只影响一次
+}
+onMounted(() => {
+    itemList = document.getElementsByClassName("img-items")
     document.body.addEventListener("keydown",pasteIntofavorite)
+    document.body.addEventListener("click",showEditFalse)
 });
 onBeforeUnmount(() => {
     // 移除事件监听器
+    itemList = []
     document.body.removeEventListener("keydown", pasteIntofavorite);
+    document.body.removeEventListener("click",showEditFalse)
 })
 
 </script>
@@ -295,18 +294,24 @@ onBeforeUnmount(() => {
                 <span class="text-sm ml-2">新建收藏夹</span>
             </div>
        </div>
-        <div v-if="imgList.length > 0" class="right-img flex-1 px-4 py-2 grid grid-cols-4 gap-4 auto-rows-min overflow-y-scroll">
-            <ImgBox @contextmenu="showImgMenu($event,item)" v-for="(item,index) in imgList" :imgInfo="item" :key="`imgbox-${index}`"/>
-            <div v-show="showContextImgMenu" ref="menuImgDom" class="contextmenu w-[100px] py-1 rounded-md absolute">
-                <li @click="delImage()" class="w-full list-none py-1 text-center cursor-pointer hover:btn-active">取消收藏</li>
-            </div>
+        <div ref="rightImgDom" v-if="imgList.length > 0" class="right-img flex-1 px-4 py-2 grid grid-cols-4 gap-4 auto-rows-min overflow-y-scroll">
+            <ImgBox class="img-items" v-for="(item,index) in imgList" :imgInfo="item" :key="`imgbox-${index}`" :ref="`imgbox-${index}`"/>
         </div>
         <div v-else class="right-img flex-1 px-2 py-2 flex justify-center items-center flex-col">
             <svg t="1708757696801" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7947" width="100" height="100"><path d="M896 722.944a25.6 25.6 0 0 1 51.2 0V819.2a76.8 76.8 0 0 1-76.8 76.8H153.6A76.8 76.8 0 0 1 76.8 819.2V256A76.8 76.8 0 0 1 153.6 179.2h716.8A76.8 76.8 0 0 1 947.2 256v288.8704a25.6 25.6 0 0 1-51.2 0V256a25.6 25.6 0 0 0-25.6-25.6H153.6a25.6 25.6 0 0 0-25.6 25.6v563.2a25.6 25.6 0 0 0 25.6 25.6h716.8a25.6 25.6 0 0 0 25.6-25.6v-96.256z m-438.784-43.2128l-93.9008-77.1584-138.1888 180.9408a25.6 25.6 0 1 1-40.6528-31.0272l141.4144-185.2416a46.08 46.08 0 0 1 65.8432-7.6288l94.208 77.4656 153.9072-170.2912a46.08 46.08 0 0 1 76.1344 11.8784l126.5152 278.7328a25.6 25.6 0 0 1-46.592 21.1968L672.6144 506.88l-151.9104 168.0896a46.08 46.08 0 0 1-63.488 4.7104zM358.4 486.4a76.8 76.8 0 1 1 0-153.6 76.8 76.8 0 0 1 0 153.6z m0-51.2a25.6 25.6 0 1 0 0-51.2 25.6 25.6 0 0 0 0 51.2z" fill="#9DA7B2" p-id="7948"></path></svg>
             <span class="text-[#bfbfbf]">暂未添加壁纸</span>
         </div>
         
-        <svg t="1731560637527" @click="addLocalImage()" title="添加壁纸" class="icon addImage" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4279" width="48" height="48"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#409EFF" p-id="4280" data-spm-anchor-id="a313x.search_index.0.i3.21e43a81eHxVft" class=""></path><path d="M713.216 462.336H310.784c-27.648 0-49.664 22.528-49.664 49.664s22.528 49.664 49.664 49.664h402.432c27.648 0 49.664-22.528 49.664-49.664s-22.528-49.664-49.664-49.664z" fill="#ffffff" p-id="4281" data-spm-anchor-id="a313x.search_index.0.i2.21e43a81eHxVft" class=""></path><path d="M462.336 310.784v402.432c0 27.648 22.528 49.664 49.664 49.664s49.664-22.528 49.664-49.664V310.784c0-27.648-22.528-49.664-49.664-49.664s-49.664 22.528-49.664 49.664z" fill="#ffffff" p-id="4282" data-spm-anchor-id="a313x.search_index.0.i1.21e43a81eHxVft" class=""></path></svg>
+        <div @click="imgEdit" class="imgEdit flex justify-center items-center" v-show="showEdit">
+            <el-button @click="delImage()" :icon="Delete" style="position: relative;">
+                <div class="num flex justify-center items-center min-w-[25px] min-h-[25px] text-white absolute -top-1 -left-3 rounded-full bg-red-500">{{ editNum.length }}</div>
+                删除收藏
+            </el-button>
+            <el-button @click="closeEdit()">关闭编辑</el-button>
+            <!-- 数量：{{ editNum.length }}   -->
+            <!-- <span @click="closeEdit()">guanbi</span> -->
+        </div>
+        <svg v-show="!showEdit" t="1731560637527" @click="addLocalImage()" title="添加壁纸" class="icon addImage" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4279" width="48" height="48"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#409EFF" p-id="4280" data-spm-anchor-id="a313x.search_index.0.i3.21e43a81eHxVft" class=""></path><path d="M713.216 462.336H310.784c-27.648 0-49.664 22.528-49.664 49.664s22.528 49.664 49.664 49.664h402.432c27.648 0 49.664-22.528 49.664-49.664s-22.528-49.664-49.664-49.664z" fill="#ffffff" p-id="4281" data-spm-anchor-id="a313x.search_index.0.i2.21e43a81eHxVft" class=""></path><path d="M462.336 310.784v402.432c0 27.648 22.528 49.664 49.664 49.664s49.664-22.528 49.664-49.664V310.784c0-27.648-22.528-49.664-49.664-49.664s-49.664 22.528-49.664 49.664z" fill="#ffffff" p-id="4282" data-spm-anchor-id="a313x.search_index.0.i1.21e43a81eHxVft" class=""></path></svg>
     </div>
     <el-dialog v-model="centerDialogVisible" title="新建收藏夹" width="500" align-center>
         <el-input v-model="favoriteCategoryName" type="text" placeholder="请输入收藏夹名" />
@@ -332,6 +337,14 @@ onBeforeUnmount(() => {
 .favorite{
     width: 100%;
     height: calc(100vh - 100px);
+    .imgEdit{
+        width: calc(100vw - 120px);
+        height: 50px;
+        background-color: #0088ff;
+        position: fixed;
+        left: 130px;
+        bottom: 20px;
+    }
     .addImage{
         position: fixed;
         right: 20px;
@@ -344,6 +357,7 @@ onBeforeUnmount(() => {
     .right-img{
         transition: all .2s;
         user-select: none;
+        position: relative;
         &::-webkit-scrollbar {
                 display: none; 
                 // width: 8px;
