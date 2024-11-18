@@ -56,7 +56,7 @@ export function insertLocalImageToFavorite(imageUrl,categoryName){
     addFavorite(imageInfo,categoryName)
 }
 // 取消收藏
-export function delFavorite(imgInfo){
+export function delFavorite(imgInfo,showMessage = true){
     favoriteAll.value = electronStore.get('favorite')
     for(let i = 0; i < favoriteAll.value.length; i++){
             favoriteAll.value[i].imgList = favoriteAll.value[i].imgList.filter((item) => {
@@ -67,7 +67,9 @@ export function delFavorite(imgInfo){
     favoriteAll.value = electronStore.get('favorite')
     // 通知收藏夹刷新
     messageStore.updateDelState(true)
-    ElMessage({message:"已取消收藏",type:"success"})
+    if(showMessage){
+        ElMessage({message:"已取消收藏",type:"success"})
+    }
     return true
 }
 // 清空收藏夹内容
