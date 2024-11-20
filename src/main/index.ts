@@ -7,7 +7,8 @@ import { ipcMainList, getVideoWindow } from './ipcMain'
 import {randWallpaper} from './utils/randWallpaper'
 import { startRandChangeWallpaper, stopRandChangeWallpaper } from './utils/randChangeWallpaper'
 import initConfig from './utils/initConfig'
-app.commandLine.appendSwitch('disable-web-security');
+// app.commandLine.appendSwitch('disable-web-security');
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 // GPU加速
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
