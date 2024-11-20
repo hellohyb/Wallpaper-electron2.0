@@ -70,7 +70,6 @@ const mousemoving = (event) => {
         if (isElementIntersecting(selectDiv, itemList[i])) {
             messageStore.showEdits(true)
             messageStore.deleteNum.push(itemList[i].__vueParentComponent.props.imgInfo)
-            //   item.style.backgroundColor = 'yellow'; // 表示部分交集
             isSelect(itemList[i])
             }
         }

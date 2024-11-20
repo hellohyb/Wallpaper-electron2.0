@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils"
-import { app, BrowserWindow, screen } from "electron"
+import { app, BrowserWindow, nativeTheme, screen } from "electron"
 import { join } from "path"
 import { UnhookMouse } from "../utils/setMouseHook"
 // windows动态壁纸窗口

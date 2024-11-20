@@ -217,6 +217,7 @@ const imgEdit = () => {
     messageStore.suppressClick = true; // 标记阻止点击事件
     setTimeout(() => messageStore.suppressClick = false, 0); // 重置标志位，确保只影响一次
 }
+
 onMounted(() => {
     itemList = document.getElementsByClassName("img-items")
     document.body.addEventListener("keydown",pasteIntofavorite)
@@ -233,7 +234,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div v-loading="loading" element-loading-text="正在导入图片..." class="favorite flex" ref="favoriteDom">
-       <div class="left-menu h-[100%] w-[130px] relative">
+       <div ref="leftMenuDom" class="left-menu h-[100%] w-[130px] relative">
         <ul class="w-[100%] !pl-0 flex flex-col justify-start items-center overflow-y-auto ">
             <li 
                 v-for="(item,index) in categoryList" 
