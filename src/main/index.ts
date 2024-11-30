@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/trayIcon/tray32-2.png?asset'
 import { UnhookMouse } from './utils/setMouseHook'
 import { ipcMainList, getVideoWindow } from './ipcMain'
-import {randWallpaper} from './utils/randWallpaper'
+import { randWallpaper } from './utils/randWallpaper'
 import { startRandChangeWallpaper, stopRandChangeWallpaper } from './utils/randChangeWallpaper'
 import initConfig from './utils/initConfig'
 // app.commandLine.appendSwitch('disable-web-security');
@@ -37,17 +37,18 @@ function createWindow(): void {
   })
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    mainWindow.webContents.openDevTools()
   })
-  mainWindow.on('close',(event) => {
+  mainWindow.on('close', (event) => {
     const remainingWindows = BrowserWindow.getAllWindows();
     // 如果当前还有动态壁纸窗口或者正在轮播壁纸 以及 不是点击的菜单栏里的退出选项
-    if ((remainingWindows.length > 1 || startChanging) && !menuSwitch){
+    if ((remainingWindows.length > 1 || startChanging) && !menuSwitch) {
       event.preventDefault();  // 阻止窗口关闭
       mainWindow.minimize()
-    }else if(menuSwitch){
+    } else if (menuSwitch) {
       return;
     }
-    
+
   })
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -77,10 +78,10 @@ let defaultMenu = [
   {
     label: '开启轮播壁纸',
     click: async () => {
-      if(startChanging){
+      if (startChanging) {
         stopRandChangeWallpaper()
         startChanging = false
-      }else{
+      } else {
         startRandChangeWallpaper(mainWindow)
         startChanging = true
       }
@@ -90,10 +91,10 @@ let defaultMenu = [
     label: '关闭动态壁纸',
     enabled: false,
     click: () => {
-      if(getVideoWindow().videoWindow){
+      if (getVideoWindow().videoWindow) {
         getVideoWindow().videoWindow.close()
       }
-      if(getVideoWindow().videoWindow2){
+      if (getVideoWindow().videoWindow2) {
         getVideoWindow().videoWindow2.close()
       }
     }
@@ -118,33 +119,33 @@ app.whenReady().then(() => {
 
   // 设置菜单
   const setMenu = () => {
-        // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
-        if(getVideoWindow().videoWindow || getVideoWindow().videoWindow2){
-          defaultMenu[defaultMenu.length - 2].enabled = true
-        }else{
-          defaultMenu[defaultMenu.length - 2].enabled = false
-        }
-        // 如果随机播放图片壁纸正在运行，则显示停止播放
-        if(startChanging){
-          defaultMenu[defaultMenu.length - 3].label = '关闭轮播壁纸'
-        }else{
-          defaultMenu[defaultMenu.length - 3].label = '开启轮播壁纸'
-        }
-        contextMenu = Menu.buildFromTemplate(defaultMenu);
-         // 手动弹出右键菜单
-         tray.popUpContextMenu(contextMenu);
+    // 如果动态壁纸窗口正在运行，则显示关闭动态壁纸选项
+    if (getVideoWindow().videoWindow || getVideoWindow().videoWindow2) {
+      defaultMenu[defaultMenu.length - 2].enabled = true
+    } else {
+      defaultMenu[defaultMenu.length - 2].enabled = false
+    }
+    // 如果随机播放图片壁纸正在运行，则显示停止播放
+    if (startChanging) {
+      defaultMenu[defaultMenu.length - 3].label = '关闭轮播壁纸'
+    } else {
+      defaultMenu[defaultMenu.length - 3].label = '开启轮播壁纸'
+    }
+    contextMenu = Menu.buildFromTemplate(defaultMenu);
+    // 手动弹出右键菜单
+    tray.popUpContextMenu(contextMenu);
   }
   // 单击托盘图标时的事件
   tray.on('click', () => {
     // createWindow();
     setMenu()
   });
-  tray.on('right-click',() => {
+  tray.on('right-click', () => {
     setMenu()
   })
   tray.on('drop-files', (_event, files) => {
     // 这里可以添加对文件的处理逻辑
-    mainWindow.webContents.send("dragLoaclImage",files)
+    mainWindow.webContents.send("dragLoaclImage", files)
   });
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -168,7 +169,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     UnhookMouse()
     app.quit()
-  }else{
+  } else {
     app.quit()
   }
 })
