@@ -1,7 +1,8 @@
-### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus、C++、objective-c
+### 技术栈：Vue3、Typescript、vite-electron、tailwindcss、element-plus、C++
 ### 项目预览
 [![pAsrbLR.png](https://s21.ax1x.com/2024/11/05/pAsrbLR.png)](https://imgse.com/i/pAsrbLR)
-
+#### 交流群：950284015
+#### 项目声明：此应用及源代码仅供学习交流，不得用于任何商业用途，否则后果自负。
 当前进度：
 ##### ✅已完成 windows动态壁纸更换
 ##### ✅已完成 windows静态壁纸更换
@@ -14,7 +15,7 @@
 ##### ✅已完成 收藏夹拉选框编辑图片功能
 ##### ✅已完成 随机切换壁纸
 
-##### ✅修复中 windows网页互动壁纸（90%）
+
 
 
 ### 更换壁纸技术分析：
