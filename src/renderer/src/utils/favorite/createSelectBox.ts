@@ -65,11 +65,13 @@ const mousemoving = (event) => {
       messageStore.deleteNum = []
       for(let i = 0; i < itemList.length; i++){
             clearSelect(itemList[i])
+            itemList[i].style.pointerEvents = "all"
         }
       for(let i = 0; i < itemList.length; i++){
         if (isElementIntersecting(selectDiv, itemList[i])) {
             messageStore.showEdits(true)
             messageStore.deleteNum.push(itemList[i].__vueParentComponent.props.imgInfo)
+            itemList[i].style.pointerEvents = "none"
             isSelect(itemList[i])
             }
         }

@@ -1,5 +1,5 @@
 import { is } from "@electron-toolkit/utils"
-import { app, BrowserWindow, nativeTheme, screen } from "electron"
+import { app, BrowserWindow, screen } from "electron"
 import { join } from "path"
 import { UnhookMouse } from "../utils/setMouseHook"
 // windows动态壁纸窗口
@@ -41,18 +41,18 @@ export function createVideoWindow() {
 // macos动态壁纸窗口
 export function createVideoWindow2() {
     const { x, y, width, height } = screen.getPrimaryDisplay().bounds;
-    let videoWindow2:any = new BrowserWindow({
-        x:x,
-        y:y,
+    let videoWindow2: any = new BrowserWindow({
+        x: x,
+        y: y,
         width: width,
         height: height + 40,
         frame: false,
         transparent: true,
         resizable: false,
-        skipTaskbar:true,
-        type:'desktop',
+        skipTaskbar: true,
+        type: 'desktop',
         autoHideMenuBar: true,
-        enableLargerThanScreen:true,
+        enableLargerThanScreen: true,
         show: false,
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
