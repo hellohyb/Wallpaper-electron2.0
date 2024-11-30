@@ -60,7 +60,8 @@ dll文件代码如下
 | 最新壁纸 | http://wp.birdpaper.com.cn/intf/newestList?pageno=1&count=5 | pageno：分页count：返回数量 |
 
 ### 成果展示：
-视频演示地址：https://www.bilibili.com/video/BV1HZ421t7Xp/
+最新成果演示地址：https://www.bilibili.com/video/BV1A3zpYGEzf/
+初始版本演示地址：https://www.bilibili.com/video/BV1HZ421t7Xp/
 
 ## Recommended IDE Setup
 
