@@ -3,6 +3,12 @@
 [![pAsrbLR.png](https://s21.ax1x.com/2024/11/05/pAsrbLR.png)](https://imgse.com/i/pAsrbLR)
 #### 交流群：950284015
 #### 项目声明：此应用及源代码仅供学习交流，不得用于任何商业用途，否则后果自负。
+
+### 下载与安装
+- [StarryWallpaper.zip - macOS (Intel)](https://github.com/hellohyb/Starry-Wallpaper/releases/download/v1.0.0/Starry.Wallpaper-1.0.0-mac.intel.x64.zip)
+- [StarryWallpaper.zip - macOS (M)](https://github.com/hellohyb/Starry-Wallpaper/releases/download/v1.0.0/Starry.Wallpaper-1.0.0-arm64-mac.zip)
+- [StarryWallpaper.zip - Windows](https://github.com/hellohyb/Starry-Wallpaper/releases/download/v1.0.0/Starry.Wallpaper-1.0.0-win.zip)
+
 当前进度：
 ##### ✅已完成 windows动态壁纸更换
 ##### ✅已完成 windows静态壁纸更换
@@ -14,8 +20,6 @@
 ##### ✅已完成 收藏夹导入本地图片
 ##### ✅已完成 收藏夹拉选框编辑图片功能
 ##### ✅已完成 随机切换壁纸
-
-
 
 
 ### 更换壁纸技术分析：
